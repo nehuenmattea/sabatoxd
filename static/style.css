@@ -1,0 +1,841 @@
+/* ==========================================================================
+   Sábatoxd — tokens de diseño
+   Paleta: sala de lectura nocturna. Fondo tinta profunda, tarjetas de papel
+   cálido, acento latón/dorado (lámpara de lectura).
+   ========================================================================== */
+
+:root {
+    /* Fondos principales */
+    --bg: #121820;                  /* Fondo más profundo y limpio */
+    --bg-panel: #1E2633;            /* Paneles secundarios */
+    --bg-panel-hover: #273244;
+
+    /* Tarjetas tipo ficha */
+    --paper: #F1ECE1;              /* Papel marfil suave */
+    --paper-soft: #E2DACB;
+    --ink: #1C232B;                /* Texto en papel */
+    --ink-soft: #505A66;
+
+    /* Textos sobre fondo oscuro */
+    --text-light: #E6EAEF;
+    --text-muted: #8C99A8;
+
+    /* Nuevos acentos (Verde Esmeralda/Limpio) */
+    --accent: #2E8B57;             /* Color principal de acento */
+    --accent-soft: #38A169;        /* Hover de botones / Enlaces */
+    --accent-ink: #FFFFFF;        /* Texto en botones principales */
+
+    /* Alertas */
+    --danger: #E55353;
+    --danger-soft: #FAD4D4;
+
+    /* Estructura */
+    --border-soft: rgba(230, 234, 239, 0.1);
+    --shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+    --radius-lg: 14px;
+    --radius-md: 10px;
+    --radius-sm: 6px;
+
+    /* Tipografías */
+    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --font-body: "Inter", -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text-light);
+    font-family: var(--font-body);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; margin: 0 0 0.3em; }
+p { margin: 0 0 0.6em; }
+
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+}
+
+/* ==========================================================================
+   Layout general
+   ========================================================================== */
+
+.page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 28px 80px;
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Alineación limpia entre logo, nav y botón */
+    
+    /* 1. Más presencia vertical y horizontal */
+    padding: 22px 36px;             /* Pasamos de 18px a 22px arriba/abajo */
+    min-height: 76px;               /* Le aseguramos una altura mínima robusta */
+    
+    border-bottom: 1px solid var(--border-soft);
+    position: sticky;
+    top: 0;
+    background: rgba(18, 24, 32, 0.94); /* Alineado a tu variable --bg con buena opacidad */
+    backdrop-filter: blur(12px);
+    z-index: 20;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    
+    /* 2. Logo más prominente */
+    font-size: 1.6rem;               /* Pasamos de 1.25rem a 1.6rem */
+    font-weight: 700;
+    color: var(--paper);
+    letter-spacing: -0.02em;        /* Un toque más compacto tipo editorial */
+}
+
+.brand-mark { 
+    font-size: 1.5rem; 
+}
+
+.nav-links { 
+    display: flex; 
+    gap: 28px;                       /* Un poco más de espacio entre enlaces */
+    align-items: center;
+}
+
+.nav-links a {
+    color: var(--text-muted);
+    font-size: 1rem;                 /* Subimos levemente de 0.95rem */
+    font-weight: 500;
+    padding: 8px 4px;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.nav-links a:hover { 
+    color: var(--text-light); 
+}
+
+.nav-links a.active { 
+    color: var(--paper);             /* Destaca más en marfil que en verde */
+    border-color: var(--accent); 
+}
+
+/* Opcional: Hacer el botón "+ Agregar libro" un pelín más grande para acompañar la barra */
+.btn-add {
+    padding: 10px 20px;
+    font-size: 0.92rem;
+}
+
+.footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-family: var(--font-mono);
+}
+.footer code {
+    background: var(--bg-panel);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* ==========================================================================
+   Botones
+   ========================================================================== */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border-radius: 999px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
+}
+.btn:active { transform: scale(0.97); }
+
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-primary:hover { background: var(--accent-soft); }
+
+.btn-ghost { background: transparent; color: var(--text-light); border-color: var(--border-soft); }
+.btn-ghost:hover { background: var(--bg-panel-hover); border-color: var(--accent); }
+
+.btn-danger { background: var(--danger); color: #FFF3F1; }
+.btn-danger:hover { background: #C6635B; }
+
+.btn-danger-outline { background: transparent; color: var(--danger-soft); border-color: var(--danger); }
+.btn-danger-outline:hover { background: rgba(181, 81, 74, 0.15); }
+
+.btn-add { white-space: nowrap; }
+
+/* ==========================================================================
+   Mensajes flash
+   ========================================================================== */
+
+.flash-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 28px;
+}
+.flash {
+    margin-top: 16px;
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    transition: opacity 0.4s ease;
+    background: var(--bg-panel);
+    border-left: 3px solid var(--accent);
+}
+.flash-error { border-left-color: var(--danger); }
+
+/* ==========================================================================
+   Hero / encabezados de sección
+   ========================================================================== */
+
+.hero { margin-bottom: 28px; }
+.hero h1 { font-size: 2.1rem; color: var(--paper); }
+.hero-sub { color: var(--text-muted); font-size: 0.95rem; }
+.hero-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+.list-header { align-items: center; }
+.list-header h1 { display: inline; }
+.list-header-dot {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--notebook-color, var(--accent));
+    margin-right: 10px;
+    vertical-align: middle;
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.06);
+}
+
+.list-banner {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 24px;
+    background-size: cover;
+    background-position: center;
+    box-shadow: var(--shadow);
+}
+.list-banner-overlay {
+    background: linear-gradient(to top, rgba(10, 13, 18, 0.92) 0%, rgba(10, 13, 18, 0.55) 70%, rgba(10, 13, 18, 0.35) 100%);
+    padding: 40px 28px 24px;
+}
+.list-banner .list-header { margin-bottom: 0; }
+.list-description {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    max-width: 640px;
+    margin-top: 8px;
+}
+.list-banner .list-description { color: rgba(233, 227, 212, 0.85); }
+
+/* ==========================================================================
+   Barra de filtros
+   ========================================================================== */
+
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    padding: 14px 16px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    margin-bottom: 28px;
+}
+.filter-bar-compact { padding: 10px 16px; margin-bottom: 20px; }
+.inline-sort-form { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.filter-search, .filter-select {
+    background: var(--bg);
+    color: var(--text-light);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+}
+.filter-search { flex: 1 1 220px; min-width: 180px; }
+.filter-search::placeholder { color: var(--text-muted); }
+.filter-select { cursor: pointer; }
+
+/* ==========================================================================
+   Grilla de libros y tarjetas
+   ========================================================================== */
+
+.book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 24px;
+}
+
+.book-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.book-cover-link {
+    display: block;
+    aspect-ratio: 2 / 3;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.book-card:hover .book-cover-link {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 34px rgba(10, 13, 20, 0.45);
+}
+
+.book-cover-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.book-cover-placeholder {
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 14px 12px;
+    border: 1px solid rgba(44, 32, 19, 0.15);
+    position: relative;
+}
+.book-cover-placeholder::after {
+    content: "";
+    position: absolute; inset: 8px;
+    border: 1px solid rgba(44, 32, 19, 0.18);
+    pointer-events: none;
+}
+.ph-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--ink);
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.ph-author {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.book-card-info { display: flex; flex-direction: column; gap: 2px; }
+.book-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.98rem;
+    color: var(--paper);
+    line-height: 1.25;
+}
+.book-title:hover { color: var(--accent-soft); }
+.book-author { color: var(--text-muted); font-size: 0.83rem; }
+
+.book-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 4px;
+}
+.book-meta-mono { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); }
+
+/* ---- Estrellas de solo lectura (con soporte de medias estrellas) ---- */
+.stars-static { display: inline-flex; gap: 1px; }
+.stars-static .star-slot { position: relative; display: inline-block; line-height: 1; }
+.stars-static .star-slot-bg { color: rgba(233, 227, 212, 0.22); }
+.stars-static .star-slot-fill {
+    position: absolute; top: 0; left: 0;
+    overflow: hidden; white-space: nowrap;
+    color: var(--accent);
+}
+.stars-sm { font-size: 0.82rem; letter-spacing: 1px; }
+.stars-lg { font-size: 1.6rem; letter-spacing: 3px; }
+.stars-on-paper .star-slot-bg { color: rgba(44, 32, 19, 0.18); }
+
+/* ---- Etiquetas de género ---- */
+.genre-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+.genre-tag {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--bg-panel-hover);
+    color: var(--text-muted);
+    border: 1px solid var(--border-soft);
+}
+
+.remove-form { position: absolute; top: 6px; right: 6px; }
+.btn-remove {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(20, 22, 28, 0.72);
+    color: #F3EAD9;
+    cursor: pointer;
+    font-size: 0.8rem;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.15s ease, background 0.15s ease;
+}
+.book-card:hover .btn-remove { opacity: 1; }
+.btn-remove:hover { background: var(--danger); }
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+    background: var(--bg-panel);
+    border: 1px dashed var(--border-soft);
+    border-radius: var(--radius-lg);
+}
+.empty-state .btn { margin-top: 12px; }
+.empty-hint { color: var(--text-muted); font-size: 0.9rem; }
+
+/* ==========================================================================
+   Formularios (tarjeta tipo ficha de papel)
+   ========================================================================== */
+
+.form-page { max-width: 760px; margin: 0 auto; }
+.form-page h1 { color: var(--paper); margin-bottom: 20px; }
+.form-page-narrow { max-width: 480px; }
+
+.card-form {
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    box-shadow: var(--shadow);
+}
+
+.form-row { 
+    display: flex;
+    gap: 20px; 
+    align-items: flex-start;
+
+}
+.form-row-split > * { 
+    flex: 1; 
+    min-width: 0;
+}
+.form-field-group { display: flex; flex-direction: column; gap: 16px; flex: 1.3; }
+.form-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.form-field-group .form-field { margin-bottom: 0; }
+
+.form-field label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.form-field input[type="text"],
+.form-field input[type="number"],
+.form-field input[type="date"],
+.form-field input[type="file"] {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    padding: 10px 12px;
+    border: 1px solid rgba(44, 32, 19, 0.25);
+    border-radius: var(--radius-sm);
+    background: #FFFDF8;
+    color: var(--ink);
+}
+.form-field input:focus { border-color: var(--accent); }
+
+.form-field textarea {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    padding: 10px 12px;
+    border: 1px solid rgba(44, 32, 19, 0.25);
+    border-radius: var(--radius-sm);
+    background: #FFFDF8;
+    color: var(--ink);
+    resize: vertical;
+    min-height: 70px;
+}
+.form-field textarea:focus { border-color: var(--accent); }
+
+.field-hint { font-size: 0.78rem; color: var(--ink-soft); }
+.checkbox-line { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--ink-soft); margin: 6px 0; }
+
+.current-cover {
+    width: 130px;
+    aspect-ratio: 2/3;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 8px;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.2);
+}
+.current-cover img { width: 100%; height: 100%; object-fit: cover; }
+.current-background { width: 100%; max-width: 320px; aspect-ratio: 16 / 9; }
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(44, 32, 19, 0.12);
+}
+.form-page .btn-ghost { border-color: rgba(44,32,19,0.25); color: var(--ink-soft); }
+.form-page .btn-ghost:hover { background: rgba(44,32,19,0.06); border-color: var(--ink-soft); }
+
+.danger-zone { margin-top: 18px; text-align: center; }
+
+/* ---- Widget de estrellas (con medias estrellas) ---- */
+.star-input {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+.star-input .star {
+    position: relative;
+    display: inline-block;
+    font-size: 1.7rem;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+}
+.star-input .star:hover { transform: scale(1.06); }
+.star-input .star .star-bg { color: rgba(44, 32, 19, 0.25); }
+.star-input .star .star-fill {
+    position: absolute; top: 0; left: 0;
+    width: 0%;
+    overflow: hidden;
+    white-space: nowrap;
+    color: var(--accent);
+}
+.rating-label {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    margin-left: 6px;
+    min-width: 70px;
+}
+.star-clear {
+    margin-left: 10px;
+    background: none;
+    border: none;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    text-decoration: underline;
+    cursor: pointer;
+    font-family: var(--font-body);
+}
+
+/* ---- Selector de géneros ---- */
+.genre-selector { display: flex; flex-direction: column; gap: 10px; }
+.genre-checkbox-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.genre-checkbox { position: relative; display: inline-block; }
+.genre-checkbox input {
+    position: absolute;
+    opacity: 0;
+    width: 100%; height: 100%;
+    margin: 0;
+    cursor: pointer;
+}
+.genre-checkbox input:disabled { cursor: not-allowed; }
+.genre-checkbox-label {
+    display: inline-block;
+    padding: 6px 13px;
+    border-radius: 999px;
+    border: 1px solid rgba(44, 32, 19, 0.25);
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    background: #FFFDF8;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.genre-checkbox input:checked + .genre-checkbox-label {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+}
+.genre-checkbox input:disabled:not(:checked) + .genre-checkbox-label {
+    opacity: 0.4;
+}
+.genre-counter {
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--ink-soft);
+}
+.genre-counter.over-limit { color: var(--danger); }
+
+/* ---- Selector de color ---- */
+.color-picker { display: flex; flex-wrap: wrap; gap: 10px; }
+.color-swatch {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+.color-swatch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.swatch-fill {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--swatch-color);
+    border: 2px solid transparent;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.4);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.color-swatch:has(input:checked) .swatch-fill {
+    transform: scale(1.1);
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.6), 0 0 0 3px var(--paper), 0 0 0 5px var(--swatch-color);
+}
+.swatch-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    letter-spacing: 0.02em;
+}
+
+/* ==========================================================================
+   Detalle de libro
+   ========================================================================== */
+
+.detail-page {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 40px;
+    align-items: start;
+}
+.detail-cover {
+    aspect-ratio: 2/3;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+.detail-cover img { width: 100%; height: 100%; object-fit: cover; }
+.detail-placeholder { padding: 24px 20px; }
+.detail-placeholder .ph-title { font-size: 1.4rem; -webkit-line-clamp: 8; }
+.detail-placeholder .ph-author { font-size: 0.85rem; }
+
+.detail-info h1 { font-size: 2rem; color: var(--paper); }
+.detail-author { color: var(--text-muted); font-size: 1.05rem; margin-bottom: 14px; }
+
+.detail-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.meta-chip {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    padding: 5px 11px;
+    border-radius: 999px;
+    color: var(--text-light);
+}
+
+.detail-rating { margin-bottom: 22px; display: flex; align-items: center; gap: 10px; }
+.rating-number { font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); }
+.no-rating { color: var(--text-muted); font-style: italic; font-size: 0.9rem; }
+
+.detail-actions { display: flex; gap: 12px; margin-bottom: 32px; }
+
+.detail-lists h2 { font-size: 1.1rem; color: var(--paper); margin-bottom: 10px; }
+.list-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+.list-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px 6px 10px;
+    border: 1px solid var(--border-soft);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    background: var(--bg-panel);
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+.list-chip:hover { background: var(--bg-panel-hover); }
+.chip-dot { width: 9px; height: 9px; border-radius: 50%; }
+.link-inline { font-size: 0.85rem; color: var(--accent-soft); }
+.link-inline:hover { text-decoration: underline; }
+
+/* ==========================================================================
+   Libretas (listas)
+   ========================================================================== */
+
+.list-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 22px;
+}
+
+.notebook-card {
+    --notebook-color: var(--accent);
+    display: flex;
+    height: 130px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.notebook-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 30px rgba(10, 13, 20, 0.4);
+}
+.notebook-spine { width: 16px; background: var(--notebook-color); flex-shrink: 0; }
+.notebook-face {
+    flex: 1;
+    background: var(--paper);
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+}
+.notebook-face::before {
+    content: "";
+    position: absolute;
+    left: 14px; top: 14px; bottom: 14px;
+    width: 1px;
+    background: repeating-linear-gradient(to bottom, rgba(44,32,19,0.15) 0 6px, transparent 6px 12px);
+}
+.notebook-name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.15rem;
+    color: var(--ink);
+    padding-left: 14px;
+}
+.notebook-count {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+    padding-left: 14px;
+}
+
+/* ---- Variante con imagen de fondo (estilo Letterboxd) ---- */
+.notebook-card.has-bg .notebook-face {
+    background-size: cover;
+    background-position: center;
+    padding: 0;
+}
+.notebook-card.has-bg .notebook-face::before { display: none; }
+.notebook-bg-overlay {
+    width: 100%; height: 100%;
+    background: linear-gradient(to top, rgba(10, 13, 18, 0.88) 0%, rgba(10, 13, 18, 0.25) 55%, rgba(10, 13, 18, 0.15) 100%);
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    box-sizing: border-box;
+}
+.notebook-card.has-bg .notebook-name,
+.notebook-card.has-bg .notebook-count {
+    color: var(--text-light);
+    padding-left: 0;
+}
+.notebook-card.has-bg .notebook-count { color: rgba(233, 227, 212, 0.75); }
+
+/* ==========================================================================
+   Buscador de libros existentes (agregar a libreta)
+   ========================================================================== */
+
+.add-existing-box {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    margin-bottom: 32px;
+}
+.add-existing-box h2 { font-size: 1.05rem; color: var(--paper); margin-bottom: 12px; }
+
+.add-existing-form { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.search-select { position: relative; flex: 1 1 320px; min-width: 240px; }
+.search-select input[type="text"] {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-soft);
+    background: var(--bg);
+    color: var(--text-light);
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+}
+.search-select input[type="text"]::placeholder { color: var(--text-muted); }
+
+.search-results {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0; right: 0;
+    background: var(--paper);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    box-shadow: 0 14px 30px rgba(0,0,0,0.4);
+    z-index: 30;
+    max-height: 260px;
+    overflow-y: auto;
+}
+.search-results.active { display: block; }
+.search-item {
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    color: var(--ink);
+    cursor: pointer;
+    border-bottom: 1px solid rgba(44,32,19,0.08);
+}
+.search-item:last-child { border-bottom: none; }
+.search-item:hover { background: rgba(201, 162, 75, 0.18); }
+.search-item-empty { color: var(--ink-soft); cursor: default; font-style: italic; }
+.search-item-empty:hover { background: none; }
+
+.or-divider { text-align: center; color: var(--text-muted); font-size: 0.8rem; margin: 16px 0 10px; }
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 720px) {
+    .topbar { flex-wrap: wrap; padding: 14px 18px; }
+    .page { padding: 22px 16px 60px; }
+    .detail-page { grid-template-columns: 1fr; }
+    .detail-cover { max-width: 220px; }
+    .form-row-split { flex-direction: column; }
+    .book-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 16px; }
+}

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+{% block title %}Sábatoxd{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+    <h1>Tu estantería</h1>
+    <p class="hero-sub">
+        {{ stats.total }} libro{{ 's' if stats.total != 1 else '' }}
+        {% if stats.read %}· {{ stats.read }} leído{{ 's' if stats.read != 1 else '' }}{% endif %}
+        {% if stats.avg_rating %}· promedio {{ stats.avg_rating }}★{% endif %}
+        {% if stats.total_lists %}· {{ stats.total_lists }} libreta{{ 's' if stats.total_lists != 1 else '' }}{% endif %}
+    </p>
+</section>
+
+<form class="filter-bar" method="GET" action="{{ url_for('index') }}">
+    <input type="text" name="q" value="{{ q }}" placeholder="Buscar por título o autor…" class="filter-search">
+
+    <select name="rating" class="filter-select" onchange="this.form.submit()">
+        <option value="" {{ 'selected' if not rating_filter }}>Todas las calificaciones</option>
+        {% for opt in rating_options %}
+            <option value="{{ opt }}" {{ 'selected' if rating_filter == opt|string }}>{{ opt|fmt_rating }} ★</option>
+        {% endfor %}
+        <option value="unrated" {{ 'selected' if rating_filter == 'unrated' }}>Sin calificar</option>
+    </select>
+
+    <select name="genre" class="filter-select" onchange="this.form.submit()">
+        <option value="" {{ 'selected' if not genre_filter }}>Todos los géneros</option>
+        {% for g in genres %}
+            <option value="{{ g['id'] }}" {{ 'selected' if genre_filter == g['id']|string }}>{{ g['name'] }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="sort" class="filter-select" onchange="this.form.submit()">
+        <option value="added" {{ 'selected' if sort == 'added' }}>Agregado recientemente</option>
+        <option value="title" {{ 'selected' if sort == 'title' }}>Título (A-Z)</option>
+        <option value="author" {{ 'selected' if sort == 'author' }}>Autor (A-Z)</option>
+        <option value="year" {{ 'selected' if sort == 'year' }}>Año de publicación</option>
+        <option value="pages" {{ 'selected' if sort == 'pages' }}>Cantidad de páginas</option>
+        <option value="rating" {{ 'selected' if sort == 'rating' }}>Calificación</option>
+        <option value="date_read" {{ 'selected' if sort == 'date_read' }}>Fecha de lectura</option>
+    </select>
+
+    <select name="order" class="filter-select" onchange="this.form.submit()">
+        <option value="desc" {{ 'selected' if order == 'desc' }}>
+            {% if sort == 'title' or sort == 'author' %}Z → A{% elif sort in ['year','date_read'] %}Más nuevo primero{% else %}Mayor a menor{% endif %}
+        </option>
+        <option value="asc" {{ 'selected' if order == 'asc' }}>
+            {% if sort == 'title' or sort == 'author' %}A → Z{% elif sort in ['year','date_read'] %}Más viejo primero{% else %}Menor a mayor{% endif %}
+        </option>
+    </select>
+
+    <button type="submit" class="btn btn-ghost">Aplicar</button>
+    {% if q or rating_filter or genre_filter or sort != 'added' or order != 'desc' %}
+        <a href="{{ url_for('index') }}" class="btn btn-ghost">Limpiar</a>
+    {% endif %}
+</form>
+
+{% if books %}
+<div class="book-grid">
+    {% for book in books %}
+        {{ macros.book_card(book) }}
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    {% if q or rating_filter or genre_filter %}
+        <p>No hay libros que coincidan con estos filtros.</p>
+        <a href="{{ url_for('index') }}" class="btn btn-ghost">Ver todos los libros</a>
+    {% else %}
+        <p>Todavía no agregaste ningún libro.</p>
+        <a href="{{ url_for('new_book') }}" class="btn btn-primary">Agregar tu primer libro</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

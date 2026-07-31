@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Libretas · Sábatoxd{% endblock %}
+
+{% block content %}
+<section class="hero hero-row">
+    <div>
+        <h1>Tus libretas</h1>
+        <p class="hero-sub">Organizá tus libros en colecciones, como "Favoritos", "2026" o "Para prestar".</p>
+    </div>
+    <a href="{{ url_for('new_list') }}" class="btn btn-primary">+ Nueva libreta</a>
+</section>
+
+{% if lists %}
+<div class="list-grid">
+    {% for l in lists %}
+    <a href="{{ url_for('list_detail', list_id=l['id']) }}"
+       class="notebook-card {{ 'has-bg' if l['background_path'] else '' }}"
+       style="--notebook-color: {{ color_hex(l['color']) }};">
+        <div class="notebook-spine"></div>
+        {% if l['background_path'] %}
+            <div class="notebook-face" style="background-image: url('{{ url_for('static', filename='list_backgrounds/' + l['background_path']) }}');">
+                <div class="notebook-bg-overlay">
+                    <span class="notebook-name">{{ l['name'] }}</span>
+                    <span class="notebook-count">{{ l['book_count'] }} libro{{ 's' if l['book_count'] != 1 else '' }}</span>
+                </div>
+            </div>
+        {% else %}
+            <div class="notebook-face">
+                <span class="notebook-name">{{ l['name'] }}</span>
+                <span class="notebook-count">{{ l['book_count'] }} libro{{ 's' if l['book_count'] != 1 else '' }}</span>
+            </div>
+        {% endif %}
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p>Todavía no creaste ninguna libreta.</p>
+    <a href="{{ url_for('new_list') }}" class="btn btn-primary">Crear tu primera libreta</a>
+</div>
+{% endif %}
+{% endblock %}

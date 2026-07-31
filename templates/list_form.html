@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar libreta' if list else 'Nueva libreta' }} · Sábatoxd{% endblock %}
+
+{% block content %}
+<div class="form-page form-page-narrow">
+    <h1>{{ 'Editar libreta' if list else 'Nueva libreta' }}</h1>
+
+    <form method="POST" enctype="multipart/form-data" class="card-form">
+        <div class="form-field">
+            <label for="name">Nombre</label>
+            <input type="text" id="name" name="name" required
+                   value="{{ list['name'] if list else '' }}" placeholder="Favoritos, Para releer, 2026…">
+        </div>
+
+        <div class="form-field">
+            <label for="description">Descripción (opcional)</label>
+            <textarea id="description" name="description" placeholder="De qué se trata esta libreta…">{{ list['description'] if list and list['description'] else '' }}</textarea>
+        </div>
+
+        <div class="form-field">
+            <label for="background">Fondo de la libreta (opcional)</label>
+
+            {% if list and list['background_path'] %}
+                <div class="current-cover current-background">
+                    <img src="{{ url_for('static', filename='list_backgrounds/' + list['background_path']) }}" alt="Fondo actual">
+                </div>
+                <label class="checkbox-line">
+                    <input type="checkbox" name="remove_background" value="1"> Quitar fondo actual
+                </label>
+                <span class="field-hint">Subí una imagen nueva abajo para reemplazarla.</span>
+            {% endif %}
+
+            <input type="file" id="background" name="background" accept="image/png,image/jpeg,image/webp,image/gif">
+            <span class="field-hint">Si no subís un fondo, la libreta se muestra con su color liso.</span>
+        </div>
+
+        <div class="form-field">
+            <label>Color de la libreta</label>
+            <div class="color-picker">
+                {% for c in list_colors %}
+                <label class="color-swatch" style="--swatch-color: {{ c.hex }};">
+                    <input type="radio" name="color" value="{{ c.name }}"
+                           {% if (list and list['color'] == c.name) or (not list and loop.first) %}checked{% endif %}>
+                    <span class="swatch-fill"></span>
+                    <span class="swatch-label">{{ c.name }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('list_detail', list_id=list['id']) if list else url_for('lists_view') }}" class="btn btn-ghost">Cancelar</a>
+            <button type="submit" class="btn btn-primary">{{ 'Guardar cambios' if list else 'Crear libreta' }}</button>
+        </div>
+    </form>
+
+    {% if list %}
+    <form method="POST" action="{{ url_for('delete_list', list_id=list['id']) }}" class="danger-zone"
+          onsubmit="return confirm('¿Eliminar la libreta \'{{ list['name'] }}\'? Los libros no se van a borrar.');">
+        <button type="submit" class="btn btn-danger-outline">Eliminar esta libreta</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

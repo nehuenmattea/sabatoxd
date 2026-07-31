@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+{% block title %}{{ list['name'] }} · Sábatoxd{% endblock %}
+
+{% block content %}
+{% if list['background_path'] %}
+<div class="list-banner" style="background-image: url('{{ url_for('static', filename='list_backgrounds/' + list['background_path']) }}');">
+    <div class="list-banner-overlay">
+        <section class="hero hero-row list-header" style="--notebook-color: {{ color_hex(list['color']) }};">
+            <div>
+                <span class="list-header-dot"></span>
+                <h1>{{ list['name'] }}</h1>
+                <p class="hero-sub">{{ books|length }} libro{{ 's' if books|length != 1 else '' }} en esta libreta</p>
+                {% if list['description'] %}<p class="list-description">{{ list['description'] }}</p>{% endif %}
+            </div>
+            <a href="{{ url_for('edit_list', list_id=list['id']) }}" class="btn btn-ghost">Editar libreta</a>
+        </section>
+    </div>
+</div>
+{% else %}
+<section class="hero hero-row list-header" style="--notebook-color: {{ color_hex(list['color']) }};">
+    <div>
+        <span class="list-header-dot"></span>
+        <h1>{{ list['name'] }}</h1>
+        <p class="hero-sub">{{ books|length }} libro{{ 's' if books|length != 1 else '' }} en esta libreta</p>
+        {% if list['description'] %}<p class="list-description">{{ list['description'] }}</p>{% endif %}
+    </div>
+    <a href="{{ url_for('edit_list', list_id=list['id']) }}" class="btn btn-ghost">Editar libreta</a>
+</section>
+{% endif %}
+
+<div class="add-existing-box">
+    <h2>Agregar un libro existente</h2>
+    {% if has_available %}
+    <form method="POST" action="{{ url_for('add_book_to_list', list_id=list['id']) }}" class="add-existing-form">
+        <div class="search-select">
+            <input type="text" id="book-search-input" placeholder="Buscar por título o autor…" autocomplete="off">
+            <input type="hidden" name="book_id" id="book-search-id">
+            <div id="book-search-results" class="search-results"></div>
+        </div>
+        <button type="submit" class="btn btn-primary" id="add-existing-btn" disabled>Agregar a esta libreta</button>
+    </form>
+    {% else %}
+        <p class="empty-hint">Ya agregaste todos tus libros a esta libreta.</p>
+    {% endif %}
+    <p class="or-divider">— o bien —</p>
+    <a href="{{ url_for('new_book', list_id=list['id']) }}" class="btn btn-ghost">Cargar un libro nuevo directamente aquí</a>
+</div>
+
+{% if books %}
+<div class="filter-bar filter-bar-compact">
+    <form method="GET" action="{{ url_for('list_detail', list_id=list['id']) }}" class="inline-sort-form">
+        <select name="sort" class="filter-select" onchange="this.form.submit()">
+            <option value="added" {{ 'selected' if sort == 'added' }}>Agregado recientemente</option>
+            <option value="title" {{ 'selected' if sort == 'title' }}>Título (A-Z)</option>
+            <option value="author" {{ 'selected' if sort == 'author' }}>Autor (A-Z)</option>
+            <option value="year" {{ 'selected' if sort == 'year' }}>Año de publicación</option>
+            <option value="pages" {{ 'selected' if sort == 'pages' }}>Cantidad de páginas</option>
+            <option value="rating" {{ 'selected' if sort == 'rating' }}>Calificación</option>
+        </select>
+        <select name="order" class="filter-select" onchange="this.form.submit()">
+            <option value="desc" {{ 'selected' if order == 'desc' }}>
+                {% if sort == 'title' or sort == 'author' %}Z → A{% else %}Mayor a menor{% endif %}
+            </option>
+            <option value="asc" {{ 'selected' if order == 'asc' }}>
+                {% if sort == 'title' or sort == 'author' %}A → Z{% else %}Menor a mayor{% endif %}
+            </option>
+        </select>
+    </form>
+</div>
+
+<div class="book-grid">
+    {% for book in books %}
+        {{ macros.book_card(book, show_remove=true, list_id=list['id']) }}
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p>Esta libreta todavía no tiene libros.</p>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.AVAILABLE_BOOKS = {{ available_books_json|tojson }};
+</script>
+{% endblock %}

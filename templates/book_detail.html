@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+{% block title %}{{ book['title'] }} · Sábatoxd{% endblock %}
+
+{% block content %}
+<div class="detail-page">
+    <div class="detail-cover">
+        {% if book['cover_path'] %}
+            <img src="{{ url_for('static', filename='covers/' + book['cover_path']) }}" alt="Portada de {{ book['title'] }}">
+        {% else %}
+            <div class="book-cover-placeholder detail-placeholder" style="background-color: {{ placeholder_color(book['title']) }};">
+                <span class="ph-title">{{ book['title'] }}</span>
+                <span class="ph-author">{{ book['author'] or '' }}</span>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="detail-info">
+        <h1>{{ book['title'] }}</h1>
+        <p class="detail-author">{{ book['author'] or 'Autor desconocido' }}</p>
+
+        <div class="detail-meta">
+            {% if book['year'] %}<span class="meta-chip">{{ book['year'] }}</span>{% endif %}
+            {% if book['pages'] %}<span class="meta-chip">{{ book['pages'] }} páginas</span>{% endif %}
+            {% if book['date_read'] %}<span class="meta-chip">Leído el {{ book['date_read'] }}</span>{% endif %}
+        </div>
+
+        {% if genres %}
+        <div class="genre-tags">
+            {% for genre in genres %}
+                <span class="genre-tag">{{ genre['name'] }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="detail-rating">
+            {% if book['rating'] %}
+                {{ macros.stars_display(book['rating'], size='stars-lg') }}
+                <span class="rating-number">{{ book['rating']|fmt_rating }} / 5</span>
+            {% else %}
+                <span class="no-rating">Sin calificar</span>
+            {% endif %}
+        </div>
+
+        <div class="detail-actions">
+            <a href="{{ url_for('edit_book', book_id=book['id']) }}" class="btn btn-ghost">Editar</a>
+            <form method="POST" action="{{ url_for('delete_book', book_id=book['id']) }}"
+                  onsubmit="return confirm('¿Eliminar \'{{ book['title'] }}\' de la estantería? Esta acción no se puede deshacer.');">
+                <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
+        </div>
+
+        <div class="detail-lists">
+            <h2>Libretas</h2>
+            {% if lists %}
+                <div class="list-chips">
+                    {% for l in lists %}
+                        <a href="{{ url_for('list_detail', list_id=l['id']) }}" class="list-chip" style="border-color: {{ color_hex(l['color']) }};">
+                            <span class="chip-dot" style="background-color: {{ color_hex(l['color']) }};"></span>
+                            {{ l['name'] }}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-hint">Este libro no está en ninguna libreta todavía.</p>
+            {% endif %}
+            <a href="{{ url_for('lists_view') }}" class="link-inline">Ir a libretas →</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

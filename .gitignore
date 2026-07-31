@@ -1,0 +1,26 @@
+# Base de datos local (se genera sola al ejecutar la app)
+estanteria.db
+estanteria.db-journal
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.Python
+venv/
+env/
+.venv/
+
+# Imágenes subidas por el usuario (contenido personal, no código)
+static/covers/*
+!static/covers/.gitkeep
+static/list_backgrounds/*
+!static/list_backgrounds/.gitkeep
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
