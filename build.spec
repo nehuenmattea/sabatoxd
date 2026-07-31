@@ -2,6 +2,15 @@
 # Spec de PyInstaller para Sábatoxd.
 # Se usa desde el workflow de GitHub Actions (o localmente con: pyinstaller build.spec)
 
+import sys
+
+if sys.platform == "win32":
+    app_icon = "static/icon.ico"
+elif sys.platform == "darwin":
+    app_icon = "static/icon.icns"
+else:
+    app_icon = "static/icon.png"
+
 a = Analysis(
     ["app.py"],
     pathex=[],
@@ -38,4 +47,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=app_icon,
 )
