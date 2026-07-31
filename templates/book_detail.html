@@ -6,7 +6,7 @@
 <div class="detail-page">
     <div class="detail-cover">
         {% if book['cover_path'] %}
-            <img src="{{ url_for('static', filename='covers/' + book['cover_path']) }}" alt="Portada de {{ book['title'] }}">
+            <img src="{{ url_for('cover_file', filename=book['cover_path']) }}" alt="Portada de {{ book['title'] }}">
         {% else %}
             <div class="book-cover-placeholder detail-placeholder" style="background-color: {{ placeholder_color(book['title']) }};">
                 <span class="ph-title">{{ book['title'] }}</span>

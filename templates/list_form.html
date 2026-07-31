@@ -22,7 +22,7 @@
 
             {% if list and list['background_path'] %}
                 <div class="current-cover current-background">
-                    <img src="{{ url_for('static', filename='list_backgrounds/' + list['background_path']) }}" alt="Fondo actual">
+                    <img src="{{ url_for('background_file', filename=list['background_path']) }}" alt="Fondo actual">
                 </div>
                 <label class="checkbox-line">
                     <input type="checkbox" name="remove_background" value="1"> Quitar fondo actual

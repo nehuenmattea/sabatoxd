@@ -15,7 +15,7 @@
 <div class="book-card">
     <a href="{{ url_for('book_detail', book_id=book['id']) }}" class="book-cover-link">
         {% if book['cover_path'] %}
-            <img class="book-cover-img" src="{{ url_for('static', filename='covers/' + book['cover_path']) }}" alt="Portada de {{ book['title'] }}">
+            <img class="book-cover-img" src="{{ url_for('cover_file', filename=book['cover_path']) }}" alt="Portada de {{ book['title'] }}">
         {% else %}
             <div class="book-cover-placeholder" style="background-color: {{ placeholder_color(book['title']) }};">
                 <span class="ph-title">{{ book['title'] }}</span>

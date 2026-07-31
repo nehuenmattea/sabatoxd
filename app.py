@@ -6,25 +6,40 @@ Luego abrir: http://127.0.0.1:5000
 """
 
 import os
+import sys
 import uuid
 import webbrowser
 import threading
 from datetime import date
 
-from flask import Flask, render_template, request, redirect, url_for, flash, abort
+from flask import Flask, render_template, request, redirect, url_for, flash, abort, send_from_directory
 from werkzeug.utils import secure_filename
 
 import database as db
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-COVERS_FOLDER = os.path.join(BASE_DIR, "static", "covers")
-BACKGROUNDS_FOLDER = os.path.join(BASE_DIR, "static", "list_backgrounds")
+# Carpeta con el código (dentro del ejecutable si está empaquetado; de solo lectura).
+# Ahí viven las plantillas y el CSS/JS, que no cambian en tiempo de ejecución.
+if getattr(sys, "frozen", False):
+    RESOURCE_DIR = sys._MEIPASS
+else:
+    RESOURCE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Carpeta persistente donde se guardan los datos del usuario (portadas, fondos).
+# En modo desarrollo es la misma carpeta del proyecto; empaquetada, una carpeta
+# aparte que sobrevive a las actualizaciones del ejecutable (ver database.py).
+DATA_DIR = db.DATA_DIR
+COVERS_FOLDER = os.path.join(DATA_DIR, "static", "covers")
+BACKGROUNDS_FOLDER = os.path.join(DATA_DIR, "static", "list_backgrounds")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif"}
 
 os.makedirs(COVERS_FOLDER, exist_ok=True)
 os.makedirs(BACKGROUNDS_FOLDER, exist_ok=True)
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    template_folder=os.path.join(RESOURCE_DIR, "templates"),
+    static_folder=os.path.join(RESOURCE_DIR, "static"),
+)
 app.secret_key = "estanteria-local-secret"  # solo se usa para mensajes flash locales
 app.teardown_appcontext(db.close_db)
 
@@ -81,6 +96,16 @@ def save_background(file_storage):
 
 def delete_background_file(filename):
     delete_upload(filename, BACKGROUNDS_FOLDER)
+
+
+@app.route("/uploads/covers/<path:filename>")
+def cover_file(filename):
+    return send_from_directory(COVERS_FOLDER, filename)
+
+
+@app.route("/uploads/backgrounds/<path:filename>")
+def background_file(filename):
+    return send_from_directory(BACKGROUNDS_FOLDER, filename)
 
 
 # Filtros / globals de Jinja
@@ -156,7 +181,7 @@ def parse_genres_form(form):
                 if gid:
                     genre_ids.append(gid)
 
-    genre_ids = list(dict.fromkeys(genre_ids))  
+    genre_ids = list(dict.fromkeys(genre_ids))  # sin duplicados, conserva el orden
     warning = None
     if len(genre_ids) > db.MAX_GENRES_PER_BOOK:
         warning = f"Un libro puede tener hasta {db.MAX_GENRES_PER_BOOK} géneros; se guardaron los primeros {db.MAX_GENRES_PER_BOOK}."
@@ -443,7 +468,22 @@ def _open_browser():
     webbrowser.open("http://127.0.0.1:5000")
 
 
+def _run_flask():
+    app.run(debug=False, port=5000, use_reloader=False)
+
+
 if __name__ == "__main__":
     db.init_db()
-    threading.Timer(1.0, _open_browser).start()
-    app.run(debug=False, port=5000)
+
+    if getattr(sys, "frozen", False):
+        # Ejecutable empaquetado: ventana nativa de escritorio con pywebview,
+        # corriendo Flask en un hilo aparte.
+        import webview
+
+        threading.Thread(target=_run_flask, daemon=True).start()
+        webview.create_window("Sábatoxd", "http://127.0.0.1:5000", width=1200, height=800)
+        webview.start()
+    else:
+        # Modo desarrollo: como siempre, abre una pestaña del navegador.
+        threading.Timer(1.0, _open_browser).start()
+        _run_flask()

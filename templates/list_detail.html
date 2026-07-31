@@ -4,7 +4,7 @@
 
 {% block content %}
 {% if list['background_path'] %}
-<div class="list-banner" style="background-image: url('{{ url_for('static', filename='list_backgrounds/' + list['background_path']) }}');">
+<div class="list-banner" style="background-image: url('{{ url_for('background_file', filename=list['background_path']) }}');">
     <div class="list-banner-overlay">
         <section class="hero hero-row list-header" style="--notebook-color: {{ color_hex(list['color']) }};">
             <div>

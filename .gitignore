@@ -24,3 +24,7 @@ Thumbs.db
 # Editores
 .vscode/
 .idea/
+
+# Carpetas que genera PyInstaller al compilar el ejecutable
+build/
+dist/

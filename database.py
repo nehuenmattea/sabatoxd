@@ -6,9 +6,35 @@ Usa sqlite3 puro (sin ORM) para mantener la app simple y sin dependencias extra.
 
 import sqlite3
 import os
+import sys
 from flask import g
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "estanteria.db")
+
+def get_data_dir():
+    """Carpeta donde se guardan los datos del usuario (base de datos e imágenes).
+
+    - En modo desarrollo (python app.py): la carpeta del proyecto, como antes.
+    - En modo empaquetado (ejecutable de PyInstaller): una carpeta persistente
+      fuera del ejecutable (que es de solo lectura y se borra/reemplaza en
+      cada actualización), para que los datos del usuario no se pierdan.
+    """
+    if getattr(sys, "frozen", False):
+        if sys.platform == "win32":
+            base = os.environ.get("APPDATA", os.path.expanduser("~"))
+        elif sys.platform == "darwin":
+            base = os.path.expanduser("~/Library/Application Support")
+        else:
+            base = os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share"))
+        data_dir = os.path.join(base, "Sabatoxd")
+    else:
+        data_dir = os.path.dirname(os.path.abspath(__file__))
+
+    os.makedirs(data_dir, exist_ok=True)
+    return data_dir
+
+
+DATA_DIR = get_data_dir()
+DB_PATH = os.path.join(DATA_DIR, "estanteria.db")
 
 # Paleta de colores básicos para las "libretas" (listas)
 LIST_COLORS = [

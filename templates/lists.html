@@ -18,7 +18,7 @@
        style="--notebook-color: {{ color_hex(l['color']) }};">
         <div class="notebook-spine"></div>
         {% if l['background_path'] %}
-            <div class="notebook-face" style="background-image: url('{{ url_for('static', filename='list_backgrounds/' + l['background_path']) }}');">
+            <div class="notebook-face" style="background-image: url('{{ url_for('background_file', filename=l['background_path']) }}');">
                 <div class="notebook-bg-overlay">
                     <span class="notebook-name">{{ l['name'] }}</span>
                     <span class="notebook-count">{{ l['book_count'] }} libro{{ 's' if l['book_count'] != 1 else '' }}</span>
