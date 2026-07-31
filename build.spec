@@ -5,9 +5,9 @@
 import sys
 
 if sys.platform == "win32":
-    app_icon = "static/icon.ico"
+    app_icon = "static/icon/icon.ico"
 elif sys.platform == "darwin":
-    app_icon = "static/icon.icns"
+    app_icon = "static/icon/icon.icns"
 else:
     app_icon = "static/icon.png"
 
