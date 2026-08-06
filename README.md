@@ -145,23 +145,4 @@ hay conexión, usa automáticamente tipografías del sistema y se ve igual de bi
 Editá la última línea de `app.py` (`app.run(debug=False, port=5000)`) y cambiá el
 número de puerto.
 
-## Subir el proyecto a Git/GitHub
 
-El repo incluye un `.gitignore` que ya excluye lo que no debería subirse: la base
-de datos (`estanteria.db`), las imágenes que subas en `static/covers/` y
-`static/list_backgrounds/`, y los archivos temporales de Python (`__pycache__/`).
-Así el repo queda liviano y no quedan expuestos tus datos personales.
-
-Para subirlo por primera vez:
-
-```bash
-git init
-git add .
-git commit -m "Primer commit: Sábatoxd"
-git branch -M main
-git remote add origin <URL_DE_TU_REPO>
-git push -u origin main
-```
-
-Cuando alguien (o vos mismo, en otra compu) clone el repo, la base de datos y las
-carpetas de imágenes se crean automáticamente al ejecutar `python app.py`.
