@@ -1,55 +1,69 @@
 # Sábatoxd
 
-Una estantería de libros que corre en tu propia computadora. Sin cuentas, sin
-nube, sin que nadie más vea qué estás leyendo. La base de datos es un único
-archivo `.db` que vive en tu disco.
+Aplicación de escritorio para llevar un registro personal de lectura. Permite
+catalogar libros, calificarlos, organizarlos en colecciones y consultar
+estadísticas básicas de lo leído. Toda la información se guarda de forma
+local, en un único archivo de base de datos SQLite, sin depender de servicios
+externos ni de una conexión a internet para funcionar.
 
-La empecé porque quería algo tipo Goodreads o Letterboxd pero para libros,
-liviano, y que no le mande mis datos de lectura a nadie. Terminó siendo un
-Flask + SQLite bastante completo: autores múltiples, relecturas con
-calificaciones separadas, libretas para organizar los libros en colecciones,
-y un empaquetado a ejecutable de escritorio para no depender de tener Python
-instalado.
+## Características
 
-## Qué hace
+**Libros**
+- Registro de título, autor o autores, año de publicación, cantidad de
+  páginas, descripción, portada (subida por el usuario o generada
+  automáticamente) y hasta cinco géneros por libro.
+- Historial de lecturas: cada libro puede tener más de una lectura
+  registrada, cada una con su propia fecha y calificación, lo que permite
+  llevar un registro de relecturas a lo largo del tiempo.
 
-- **Libros**: título, uno o más autores, año, páginas, descripción, portada
-  (subida o generada automáticamente) y hasta 5 géneros.
-- **Relecturas**: cada vez que releés un libro podés registrar una nueva
-  fecha y calificación sin perder el historial anterior. La ficha del libro
-  muestra todas las lecturas; la más reciente es la que se usa para ordenar
-  y filtrar en la vista general.
-- **Autores**: se crean solos al cargar un libro. Tocando un autor ves todos
-  sus libros sin tener que buscar nada.
-- **Libretas**: colecciones de libros con color, descripción e imagen de
-  fondo propia. Podés agregar libros ya cargados con un buscador o con un
-  selector visual (tocás uno y se atenúa para marcar que ya está agregado).
-  También tienen un bloc de notas de texto libre para anotar cosas como
-  "para leer" sin necesidad de cargar el libro todavía.
-- **Géneros**: los que vienen precargados se pueden renombrar o borrar como
-  cualquier otro.
-- **Perfil**: nombre de usuario, foto y hasta 4 libros favoritos, al estilo
-  Letterboxd. Por defecto es "guest" y sin foto.
-- **Actividad**: un registro cronológico de qué se agregó, editó o borró.
-- **Copia de seguridad**: descargar y restaurar la base de datos completa
-  desde el perfil, para llevarte tus datos a otra computadora o simplemente
-  tener un respaldo. Al restaurar pide confirmación explícita y guarda una
-  copia de lo anterior por las dudas.
-- Filtros y orden por calificación (con medias estrellas), género, autor,
-  año, páginas, fecha de lectura y búsqueda de texto.
+**Autores**
+- Los autores se generan automáticamente al cargar un libro. Cada autor
+  cuenta con una página propia donde se listan todos los libros asociados a
+  él.
 
-## Cómo se usa
+**Géneros**
+- Los géneros pueden crearse libremente al cargar un libro, y también
+  renombrarse o eliminarse desde una sección dedicada.
 
-### Descargando el ejecutable
+**Libretas (colecciones)**
+- Los libros pueden agruparse en libretas temáticas, cada una con nombre,
+  color, descripción e imagen de fondo opcional.
+- Un libro puede pertenecer a varias libretas a la vez.
+- Cada libreta incluye además un espacio de notas de texto libre, útil para
+  anotar títulos pendientes sin necesidad de cargarlos como libro todavía.
 
-Es la forma más simple si no querés tocar código. En [Releases][releases] hay
-un ejecutable para Windows, Mac y Linux — se compilan solos con GitHub
-Actions cada vez que se publica una versión nueva. Lo abrís y listo, no hace
-falta instalar Python ni nada.
+**Perfil**
+- Sección de perfil con nombre de usuario, foto y hasta cuatro libros
+  marcados como favoritos.
 
-[releases]: https://github.com/nehuenmattea/sabatoxd/releases
+**Actividad**
+- Registro cronológico de las acciones realizadas en la aplicación (altas,
+  ediciones y eliminaciones de libros, libretas y géneros).
 
-### Corriéndolo desde el código
+**Filtros y orden**
+- La vista principal permite ordenar y filtrar los libros por calificación,
+  género, autor, año de publicación, cantidad de páginas, fecha de lectura o
+  búsqueda de texto libre.
+
+**Copia de seguridad**
+- Desde la sección de perfil se puede descargar la base de datos completa
+  como archivo de respaldo, y restaurarla posteriormente (en la misma
+  computadora o en otra). La restauración requiere confirmación explícita y
+  conserva automáticamente una copia de los datos previos antes de
+  reemplazarlos.
+
+## Instalación y uso
+
+### Ejecutable
+
+En la sección [Releases](https://github.com/nehuenmattea/sabatoxd/releases)
+del repositorio están disponibles ejecutables para Windows, macOS y Linux,
+generados automáticamente. No requieren instalar Python ni ninguna
+dependencia adicional.
+
+### Desde el código fuente
+
+Requisitos: Python 3.10 o superior.
 
 ```bash
 git clone https://github.com/nehuenmattea/sabatoxd.git
@@ -60,60 +74,176 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Se abre solo en `http://127.0.0.1:5000`.
+La aplicación se abre automáticamente en `http://127.0.0.1:5000`.
 
-## Dónde vive tu información
+## Almacenamiento de datos
 
-- Corriendo desde el código: todo queda en la misma carpeta del proyecto
-  (`estanteria.db`, `static/covers/`, `static/list_backgrounds/`,
-  `static/profile/`).
-- Corriendo el ejecutable: en una carpeta aparte fuera del programa, para que
-  sobreviva a las actualizaciones (`%APPDATA%\Sabatoxd` en Windows,
-  `~/Library/Application Support/Sabatoxd` en Mac,
-  `~/.local/share/Sabatoxd` en Linux).
+Al ejecutarse desde el código fuente, los datos se guardan en la misma
+carpeta del proyecto:
 
-Para respaldar o mover tus datos a otra computadora, lo más simple es
-**Perfil → Copia de seguridad**, que descarga un único archivo `.db` con
-todo. También podés copiar esa carpeta a mano si preferís.
+- `estanteria.db`: base de datos con todos los libros, autores, lecturas,
+  libretas, géneros, notas, actividad y perfil.
+- `static/covers/`: portadas de libros subidas por el usuario.
+- `static/list_backgrounds/`: imágenes de fondo de las libretas.
+- `static/profile/`: foto de perfil.
 
-## Cómo está armado
+Al ejecutarse como aplicación empaquetada, estos mismos archivos se
+almacenan en una carpeta independiente del programa, de modo que los datos
+se conserven entre actualizaciones:
+
+| Sistema  | Ubicación                                       |
+|----------|--------------------------------------------------|
+| Windows  | `%APPDATA%\Sabatoxd`                              |
+| macOS    | `~/Library/Application Support/Sabatoxd`          |
+| Linux    | `~/.local/share/Sabatoxd`                         |
+
+## Estructura del proyecto
 
 ```
 sabatoxd/
-├── app.py              # rutas Flask y lógica de la aplicación
-├── database.py          # todo el acceso a SQLite, sin ORM
-├── build.spec           # empaquetado a ejecutable con PyInstaller
+├── app.py              # Rutas y lógica de la aplicación (Flask)
+├── database.py          # Acceso a la base de datos (SQLite)
+├── build.spec            # Configuración de empaquetado (PyInstaller)
 ├── static/
 │   ├── style.css
-│   ├── app.js            # JS vanilla, sin frameworks
+│   ├── app.js
 │   ├── covers/
 │   ├── list_backgrounds/
 │   └── profile/
-└── templates/            # Jinja2, server-side rendering
+└── templates/             # Vistas HTML (Jinja2)
 ```
 
-Decisiones a propósito:
+## Tecnologías
 
-- **Sin ORM.** `database.py` usa `sqlite3` directo con SQL escrito a mano.
-  Para el tamaño de esta app un ORM agrega más capas de las que resuelve.
-- **Sin frameworks de frontend.** Las páginas son HTML renderizado en el
-  servidor; el JS que hay es solo para las partes que necesitan
-  interactividad puntual (el selector visual de libros, los buscadores).
-- **Migraciones caseras.** `init_db()` corre en cada arranque y aplica los
-  cambios de esquema que falten sin borrar nada existente. No hay un
-  sistema de migraciones formal (tipo Alembic) porque para una app de un
-  solo usuario local no vale la pena la complejidad extra.
-- **El ejecutable envuelve el mismo Flask.** El build con PyInstaller usa
-  [pywebview](https://pywebview.flowrl.com/) para mostrar una ventana nativa
-  en vez de abrir el navegador, pero por debajo sigue siendo la misma app
-  Flask corriendo en un hilo local.
+- **Backend:** Python, Flask
+- **Base de datos:** SQLite (acceso directo, sin ORM)
+- **Frontend:** HTML renderizado en el servidor (Jinja2), JavaScript sin
+  frameworks
+- **Empaquetado:** PyInstaller + pywebview, con compilación automática de
+  ejecutables mediante GitHub Actions al publicar una nueva versión
+README_EOF
+Salida
 
-## Stack
+# Sábatoxd
 
-Python · Flask · SQLite · Jinja2 · JavaScript vanilla · PyInstaller
+Aplicación de escritorio para llevar un registro personal de lectura. Permite
+catalogar libros, calificarlos, organizarlos en colecciones y consultar
+estadísticas básicas de lo leído. Toda la información se guarda de forma
+local, en un único archivo de base de datos SQLite, sin depender de servicios
+externos ni de una conexión a internet para funcionar.
 
-## Estado
+## Características
 
-Uso personal, en desarrollo activo cuando me surge una idea o encuentro algo
-que me gustaría que hiciera distinto. Si algo se rompe o tenés una sugerencia,
-abrí un issue.
+**Libros**
+- Registro de título, autor o autores, año de publicación, cantidad de
+  páginas, descripción, portada (subida por el usuario o generada
+  automáticamente) y hasta cinco géneros por libro.
+- Historial de lecturas: cada libro puede tener más de una lectura
+  registrada, cada una con su propia fecha y calificación, lo que permite
+  llevar un registro de relecturas a lo largo del tiempo.
+
+**Autores**
+- Los autores se generan automáticamente al cargar un libro. Cada autor
+  cuenta con una página propia donde se listan todos los libros asociados a
+  él.
+
+**Géneros**
+- Los géneros pueden crearse libremente al cargar un libro, y también
+  renombrarse o eliminarse desde una sección dedicada.
+
+**Libretas (colecciones)**
+- Los libros pueden agruparse en libretas temáticas, cada una con nombre,
+  color, descripción e imagen de fondo opcional.
+- Un libro puede pertenecer a varias libretas a la vez.
+- Cada libreta incluye además un espacio de notas de texto libre, útil para
+  anotar títulos pendientes sin necesidad de cargarlos como libro todavía.
+
+**Perfil**
+- Sección de perfil con nombre de usuario, foto y hasta cuatro libros
+  marcados como favoritos.
+
+**Actividad**
+- Registro cronológico de las acciones realizadas en la aplicación (altas,
+  ediciones y eliminaciones de libros, libretas y géneros).
+
+**Filtros y orden**
+- La vista principal permite ordenar y filtrar los libros por calificación,
+  género, autor, año de publicación, cantidad de páginas, fecha de lectura o
+  búsqueda de texto libre.
+
+**Copia de seguridad**
+- Desde la sección de perfil se puede descargar la base de datos completa
+  como archivo de respaldo, y restaurarla posteriormente (en la misma
+  computadora o en otra). La restauración requiere confirmación explícita y
+  conserva automáticamente una copia de los datos previos antes de
+  reemplazarlos.
+
+## Instalación y uso
+
+### Ejecutable
+
+En la sección [Releases](https://github.com/nehuenmattea/sabatoxd/releases)
+del repositorio están disponibles ejecutables para Windows, macOS y Linux,
+generados automáticamente. No requieren instalar Python ni ninguna
+dependencia adicional.
+
+### Desde el código fuente
+
+Requisitos: Python 3.10 o superior.
+
+```bash
+git clone https://github.com/nehuenmattea/sabatoxd.git
+cd sabatoxd
+python -m venv venv
+source venv/bin/activate      # en Windows: venv\Scripts\activate
+pip install -r requirements.txt
+python app.py
+```
+
+La aplicación se abre automáticamente en `http://127.0.0.1:5000`.
+
+## Almacenamiento de datos
+
+Al ejecutarse desde el código fuente, los datos se guardan en la misma
+carpeta del proyecto:
+
+- `estanteria.db`: base de datos con todos los libros, autores, lecturas,
+  libretas, géneros, notas, actividad y perfil.
+- `static/covers/`: portadas de libros subidas por el usuario.
+- `static/list_backgrounds/`: imágenes de fondo de las libretas.
+- `static/profile/`: foto de perfil.
+
+Al ejecutarse como aplicación empaquetada, estos mismos archivos se
+almacenan en una carpeta independiente del programa, de modo que los datos
+se conserven entre actualizaciones:
+
+| Sistema  | Ubicación                                       |
+|----------|--------------------------------------------------|
+| Windows  | `%APPDATA%\Sabatoxd`                              |
+| macOS    | `~/Library/Application Support/Sabatoxd`          |
+| Linux    | `~/.local/share/Sabatoxd`                         |
+
+## Estructura del proyecto
+
+```
+sabatoxd/
+├── app.py              # Rutas y lógica de la aplicación (Flask)
+├── database.py          # Acceso a la base de datos (SQLite)
+├── build.spec            # Configuración de empaquetado (PyInstaller)
+├── static/
+│   ├── style.css
+│   ├── app.js
+│   ├── covers/
+│   ├── list_backgrounds/
+│   └── profile/
+└── templates/             # Vistas HTML (Jinja2)
+```
+
+## Tecnologías
+
+- **Backend:** Python, Flask
+- **Base de datos:** SQLite (acceso directo, sin ORM)
+- **Frontend:** HTML renderizado en el servidor (Jinja2), JavaScript sin
+  frameworks
+- **Empaquetado:** PyInstaller + pywebview, con compilación automática de
+  ejecutables mediante GitHub Actions al publicar una nueva versión
