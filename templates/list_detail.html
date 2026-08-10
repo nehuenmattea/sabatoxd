@@ -72,13 +72,24 @@
     {% if notes %}
     <ul class="note-list">
         {% for note in notes %}
-        <li class="note-item {{ 'note-done' if note['done'] }}">
-            <form method="POST" action="{{ url_for('toggle_note_route', list_id=list['id'], note_id=note['id']) }}" class="note-toggle-form">
-                <button type="submit" class="note-check" title="Marcar como hecho">{{ '✓' if note['done'] else '' }}</button>
-            </form>
-            <span class="note-text">{{ note['text'] }}</span>
-            <form method="POST" action="{{ url_for('delete_note_route', list_id=list['id'], note_id=note['id']) }}" class="note-delete-form">
-                <button type="submit" class="btn-remove" title="Borrar nota">✕</button>
+        <li class="note-item {{ 'note-done' if note['done'] }}" id="note-{{ note['id'] }}">
+            <div class="note-item-row">
+                <form method="POST" action="{{ url_for('toggle_note_route', list_id=list['id'], note_id=note['id']) }}" class="note-toggle-form">
+                    <button type="submit" class="note-check" title="Marcar como hecho">{{ '✓' if note['done'] else '' }}</button>
+                </form>
+                <span class="note-text">{{ note['text'] }}</span>
+                <div class="note-item-actions">
+                    <button type="button" class="note-edit-btn" title="Editar nota" data-target="note-edit-{{ note['id'] }}">✎</button>
+                    <form method="POST" action="{{ url_for('delete_note_route', list_id=list['id'], note_id=note['id']) }}" class="note-delete-form"
+                          onsubmit="return confirm('¿Borrar esta nota?');">
+                        <button type="submit" class="note-remove-btn" title="Borrar nota">✕</button>
+                    </form>
+                </div>
+            </div>
+            <form method="POST" action="{{ url_for('edit_note_route', list_id=list['id'], note_id=note['id']) }}"
+                  class="note-edit-form hidden" id="note-edit-{{ note['id'] }}">
+                <input type="text" name="text" maxlength="300" value="{{ note['text'] }}" required autocomplete="off">
+                <button type="submit" class="btn btn-primary btn-small">Guardar</button>
             </form>
         </li>
         {% endfor %}

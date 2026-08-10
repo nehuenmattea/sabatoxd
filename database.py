@@ -723,6 +723,16 @@ def toggle_list_note(note_id):
     db.commit()
 
 
+def update_list_note(note_id, text):
+    text = (text or "").strip()
+    if not text:
+        return False
+    db = get_db()
+    db.execute("UPDATE list_notes SET text=? WHERE id=?", (text, note_id))
+    db.commit()
+    return True
+
+
 def delete_list_note(note_id):
     db = get_db()
     db.execute("DELETE FROM list_notes WHERE id=?", (note_id,))

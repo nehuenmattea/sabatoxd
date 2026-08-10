@@ -325,6 +325,24 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // -----------------------------------------------------------------------
+    // Editar una nota rápida de una libreta: el lápiz muestra un input inline
+    // -----------------------------------------------------------------------
+    document.querySelectorAll(".note-edit-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const target = document.getElementById(btn.dataset.target);
+            if (!target) return;
+            target.classList.toggle("hidden");
+            if (!target.classList.contains("hidden")) {
+                const input = target.querySelector("input[type=text]");
+                if (input) {
+                    input.focus();
+                    input.select();
+                }
+            }
+        });
+    });
+
     // Confirmar antes de subir una fecha de lectura futura (respaldo del atributo max)
     const dateInput = document.getElementById("date_read");
     if (dateInput) {

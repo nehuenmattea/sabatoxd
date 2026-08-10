@@ -1015,11 +1015,11 @@ p { margin: 0 0 0.6em; }
 
 .note-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .note-item {
-    display: flex; align-items: center; gap: 10px;
     padding: 8px 10px;
     border-radius: var(--radius-sm);
     background: var(--bg);
 }
+.note-item-row { display: flex; align-items: center; gap: 10px; }
 .note-toggle-form, .note-delete-form { margin: 0; }
 .note-check {
     width: 22px; height: 22px; flex: none;
@@ -1031,9 +1031,41 @@ p { margin: 0 0 0.6em; }
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
 }
-.note-text { flex: 1; font-size: 0.88rem; color: var(--text-light); }
+.note-text { flex: 1; font-size: 0.88rem; color: var(--text-light); word-break: break-word; }
 .note-done .note-text { text-decoration: line-through; color: var(--text-muted); }
 .note-done .note-check { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.note-item-actions { display: flex; align-items: center; gap: 4px; flex: none; }
+.note-edit-btn, .note-remove-btn {
+    width: 24px; height: 24px; flex: none;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.82rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.note-edit-btn:hover { background: rgba(255,255,255,0.08); color: var(--text-light); }
+.note-remove-btn:hover { background: var(--danger); color: #fff; }
+
+.note-edit-form {
+    display: flex;
+    gap: 8px;
+    margin: 8px 0 2px 32px;
+}
+.note-edit-form input[type="text"] {
+    flex: 1;
+    padding: 7px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(230, 234, 239, 0.18);
+    background: var(--bg-panel);
+    color: var(--text-light);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+}
+.note-edit-form input[type="text"]:focus { border-color: var(--accent); outline: none; }
 
 /* ==========================================================================
    Autores

@@ -631,6 +631,16 @@ def toggle_note_route(list_id, note_id):
     return redirect(url_for("list_detail", list_id=list_id))
 
 
+@app.route("/listas/<int:list_id>/notas/<int:note_id>/editar", methods=["POST"])
+def edit_note_route(list_id, note_id):
+    text = request.form.get("text", "").strip()
+    if not text:
+        flash("La nota no puede quedar vacía.", "error")
+    else:
+        db.update_list_note(note_id, text)
+    return redirect(url_for("list_detail", list_id=list_id))
+
+
 @app.route("/listas/<int:list_id>/notas/<int:note_id>/borrar", methods=["POST"])
 def delete_note_route(list_id, note_id):
     db.delete_list_note(note_id)
