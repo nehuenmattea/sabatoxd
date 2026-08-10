@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Autores · Sábatoxd{% endblock %}
+
+{% block content %}
+<section class="hero hero-row">
+    <div>
+        <h1>Autores</h1>
+        <p class="hero-sub">Tocá un autor para ver qué libros suyos tenés cargados, sin buscar.</p>
+    </div>
+</section>
+
+{% if authors %}
+<div class="author-grid">
+    {% for a in authors %}
+    <a href="{{ url_for('author_detail', author_id=a['id']) }}" class="author-card">
+        <span class="author-card-initial">{{ a['name'][:1] | upper }}</span>
+        <span class="author-card-name">{{ a['name'] }}</span>
+        <span class="author-card-count">{{ a['book_count'] }} libro{{ 's' if a['book_count'] != 1 else '' }}</span>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p>Todavía no cargaste ningún autor. Se crean automáticamente al agregar libros.</p>
+    <a href="{{ url_for('new_book') }}" class="btn btn-primary">Agregar un libro</a>
+</div>
+{% endif %}
+{% endblock %}

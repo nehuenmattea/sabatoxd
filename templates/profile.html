@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Perfil · Sábatoxd{% endblock %}
+
+{% block content %}
+<section class="hero hero-row">
+    <div>
+        <h1>Perfil</h1>
+        <p class="hero-sub">Tu nombre, tu foto y tus 4 libros favoritos.</p>
+    </div>
+</section>
+
+<div class="form-page">
+    <form method="POST" enctype="multipart/form-data" class="card-form">
+        <div class="form-row form-row-split">
+            <div class="form-field">
+                <label for="photo">Foto de perfil</label>
+                {% if profile['photo_path'] %}
+                    <div class="current-cover current-profile-photo">
+                        <img src="{{ url_for('profile_photo_file', filename=profile['photo_path']) }}" alt="Foto de perfil">
+                    </div>
+                    <label class="checkbox-line">
+                        <input type="checkbox" name="remove_photo" value="1"> Quitar foto actual
+                    </label>
+                {% else %}
+                    <div class="current-cover current-profile-photo profile-photo-placeholder">
+                        <span>{{ (profile['username'] or 'guest')[:1] | upper }}</span>
+                    </div>
+                {% endif %}
+                <input type="file" id="photo" name="photo" accept="image/png,image/jpeg,image/webp,image/gif">
+                <span class="field-hint">Por defecto no tenés foto y el usuario se llama "guest".</span>
+            </div>
+
+            <div class="form-field-group">
+                <div class="form-field">
+                    <label for="username">Nombre de usuario</label>
+                    <input type="text" id="username" name="username" maxlength="40"
+                           value="{{ profile['username'] }}" placeholder="guest">
+                </div>
+                <div class="form-field">
+                    <label for="bio">Sobre vos (opcional)</label>
+                    <textarea id="bio" name="bio" rows="3" maxlength="300">{{ profile['bio'] or '' }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label>Libros favoritos <span class="field-hint">(hasta 4, al estilo Letterboxd)</span></label>
+            <div class="fav-books-grid">
+                {% for i in range(1, 5) %}
+                {% set fav = favorite_books[i-1] if favorite_books|length >= i else none %}
+                <div class="fav-book-picker" data-slot="{{ i }}">
+                    <div class="fav-book-slot-cover">
+                        {% if fav and fav['cover_path'] %}
+                            <img src="{{ url_for('cover_file', filename=fav['cover_path']) }}" alt="">
+                        {% elif fav %}
+                            <div class="book-cover-placeholder" style="background-color: {{ placeholder_color(fav['title']) }};">
+                                <span class="ph-title">{{ fav['title'] }}</span>
+                            </div>
+                        {% else %}
+                            <span class="fav-slot-empty">{{ i }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="search-select">
+                        <input type="text" class="fav-search-input" placeholder="Buscar libro…" autocomplete="off"
+                               value="{{ (fav['title'] + (' — ' + fav['author'] if fav['author'] else '')) if fav else '' }}">
+                        <input type="hidden" class="fav-search-id" name="fav_book_{{ i }}" value="{{ fav['id'] if fav else '' }}">
+                        <div class="search-results fav-search-results"></div>
+                    </div>
+                    <button type="button" class="link-inline fav-clear-btn">Quitar</button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Guardar perfil</button>
+        </div>
+    </form>
+
+    <div class="card-form backup-box">
+        <h2>Copia de seguridad</h2>
+        <p class="field-hint">
+            Descargá tu base de datos completa (libros, libretas, autores, notas, actividad) para guardarla
+            como respaldo o para pasarla a otra computadora.
+        </p>
+        <a href="{{ url_for('download_backup') }}" class="btn btn-ghost">Descargar copia de seguridad (.db)</a>
+
+        <h2 class="backup-restore-title">Restaurar desde una copia</h2>
+        <p class="field-hint">
+            Subí un archivo <code>.db</code> exportado desde Sábatoxd (de esta u otra computadora).
+            <strong>Esto reemplaza todos los libros, libretas, autores y notas que tenés cargados ahora.</strong>
+            Antes de restaurar se guarda automáticamente una copia de tus datos actuales, por las dudas.
+        </p>
+        <form method="POST" action="{{ url_for('restore_backup') }}" enctype="multipart/form-data" id="restore-backup-form" class="restore-form">
+            <input type="file" name="backup_file" id="restore-file-input" accept=".db,.sqlite,.sqlite3">
+            <label class="checkbox-line checkbox-danger">
+                <input type="checkbox" name="confirm" value="1" id="restore-confirm-checkbox">
+                Entiendo que esto reemplaza todos mis datos actuales por los del archivo elegido.
+            </label>
+            <button type="submit" class="btn btn-danger">Restaurar base de datos</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.PROFILE_BOOKS = {{ books_json|tojson }};
+</script>
+{% endblock %}

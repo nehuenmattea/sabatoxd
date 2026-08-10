@@ -16,6 +16,11 @@ static/covers/*
 !static/covers/.gitkeep
 static/list_backgrounds/*
 !static/list_backgrounds/.gitkeep
+static/profile/*
+!static/profile/.gitkeep
+
+# Copia de seguridad automática que se genera al restaurar una base de datos
+estanteria.antes-de-restaurar.db
 
 # Archivos del sistema operativo
 .DS_Store

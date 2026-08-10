@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+{% block title %}{{ author['name'] }} · Sábatoxd{% endblock %}
+
+{% block content %}
+<section class="hero hero-row">
+    <div>
+        <p class="hero-eyebrow"><a href="{{ url_for('authors_view') }}" class="link-inline">← Autores</a></p>
+        <h1>{{ author['name'] }}</h1>
+        <p class="hero-sub">{{ books|length }} libro{{ 's' if books|length != 1 else '' }} cargado{{ 's' if books|length != 1 else '' }}</p>
+    </div>
+</section>
+
+{% if books %}
+<div class="book-grid">
+    {% for book in books %}
+        {{ macros.book_card(book) }}
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p>No hay libros cargados de este autor.</p>
+</div>
+{% endif %}
+{% endblock %}

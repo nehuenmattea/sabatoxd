@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Actividad · Sábatoxd{% endblock %}
+
+{% block content %}
+<section class="hero hero-row">
+    <div>
+        <h1>Actividad</h1>
+        <p class="hero-sub">Un registro de los últimos cambios en tu estantería.</p>
+    </div>
+</section>
+
+{% if entries %}
+<div class="activity-list">
+    {% for e in entries %}
+    <div class="activity-row">
+        <span class="activity-dot activity-{{ e['action'] }}"></span>
+        <div class="activity-body">
+            <span class="activity-message">{{ e['message'] }}</span>
+            <span class="activity-time">{{ e['created_at'] }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p>Todavía no hay actividad registrada.</p>
+</div>
+{% endif %}
+{% endblock %}

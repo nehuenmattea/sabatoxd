@@ -13,14 +13,29 @@
 </head>
 <body>
 <header class="topbar">
+  <div class="topbar-inner">
     <a href="{{ url_for('index') }}" class="brand">
         <span class="brand-text">Sábatoxd</span>
     </a>
     <nav class="nav-links">
         <a href="{{ url_for('index') }}" class="{{ 'active' if request.endpoint == 'index' else '' }}">Inicio</a>
         <a href="{{ url_for('lists_view') }}" class="{{ 'active' if request.endpoint in ['lists_view','list_detail','new_list','edit_list'] else '' }}">Libretas</a>
+        <a href="{{ url_for('authors_view') }}" class="{{ 'active' if request.endpoint in ['authors_view','author_detail'] else '' }}">Autores</a>
+        <a href="{{ url_for('genres_view') }}" class="{{ 'active' if request.endpoint == 'genres_view' else '' }}">Géneros</a>
+        <a href="{{ url_for('activity_view') }}" class="{{ 'active' if request.endpoint == 'activity_view' else '' }}">Actividad</a>
     </nav>
-    <a href="{{ url_for('new_book') }}" class="btn btn-primary btn-add">+ Agregar libro</a>
+    <div class="topbar-right">
+        <a href="{{ url_for('new_book') }}" class="btn btn-primary btn-add">+ Agregar libro</a>
+        <a href="{{ url_for('profile_view') }}" class="profile-chip {{ 'active' if request.endpoint == 'profile_view' else '' }}" title="Perfil">
+            {% if current_profile and current_profile.photo_path %}
+                <img src="{{ url_for('profile_photo_file', filename=current_profile.photo_path) }}" alt="">
+            {% else %}
+                <span class="profile-chip-fallback">{{ (current_profile.username if current_profile else 'guest')[:1] | upper }}</span>
+            {% endif %}
+            <span class="profile-chip-name">{{ current_profile.username if current_profile else 'guest' }}</span>
+        </a>
+    </div>
+  </div>
 </header>
 
 <div class="flash-wrap">

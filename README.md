@@ -1,167 +1,119 @@
-# Mi Estantería 📖
+# Sábatoxd
 
-Aplicación personal y 100% local para registrar los libros que leés, calificarlos
-y organizarlos en libretas (listas), inspirada en Letterboxd/Serializd pero para libros.
+Una estantería de libros que corre en tu propia computadora. Sin cuentas, sin
+nube, sin que nadie más vea qué estás leyendo. La base de datos es un único
+archivo `.db` que vive en tu disco.
 
-Toda la información se guarda en un archivo SQLite (`estanteria.db`) en tu propia
-computadora. No se envía nada a internet ni requiere cuenta de usuario.
+La empecé porque quería algo tipo Goodreads o Letterboxd pero para libros,
+liviano, y que no le mande mis datos de lectura a nadie. Terminó siendo un
+Flask + SQLite bastante completo: autores múltiples, relecturas con
+calificaciones separadas, libretas para organizar los libros en colecciones,
+y un empaquetado a ejecutable de escritorio para no depender de tener Python
+instalado.
 
-## Descarga directa (sin instalar nada)
+## Qué hace
 
-Si solo querés **usar** la app, sin tocar código:
+- **Libros**: título, uno o más autores, año, páginas, descripción, portada
+  (subida o generada automáticamente) y hasta 5 géneros.
+- **Relecturas**: cada vez que releés un libro podés registrar una nueva
+  fecha y calificación sin perder el historial anterior. La ficha del libro
+  muestra todas las lecturas; la más reciente es la que se usa para ordenar
+  y filtrar en la vista general.
+- **Autores**: se crean solos al cargar un libro. Tocando un autor ves todos
+  sus libros sin tener que buscar nada.
+- **Libretas**: colecciones de libros con color, descripción e imagen de
+  fondo propia. Podés agregar libros ya cargados con un buscador o con un
+  selector visual (tocás uno y se atenúa para marcar que ya está agregado).
+  También tienen un bloc de notas de texto libre para anotar cosas como
+  "para leer" sin necesidad de cargar el libro todavía.
+- **Géneros**: los que vienen precargados se pueden renombrar o borrar como
+  cualquier otro.
+- **Perfil**: nombre de usuario, foto y hasta 4 libros favoritos, al estilo
+  Letterboxd. Por defecto es "guest" y sin foto.
+- **Actividad**: un registro cronológico de qué se agregó, editó o borró.
+- **Copia de seguridad**: descargar y restaurar la base de datos completa
+  desde el perfil, para llevarte tus datos a otra computadora o simplemente
+  tener un respaldo. Al restaurar pide confirmación explícita y guarda una
+  copia de lo anterior por las dudas.
+- Filtros y orden por calificación (con medias estrellas), género, autor,
+  año, páginas, fecha de lectura y búsqueda de texto.
 
-1. Andá a la sección [Releases](../../releases) de este repositorio.
-2. Descargá el archivo que corresponda a tu sistema operativo (`Sabatoxd-Windows.exe`,
-   `Sabatoxd-Mac` o `Sabatoxd-Linux`).
-3. Abrilo con doble clic. Se va a abrir una ventana de la app; no hace falta
-   terminal ni instalar Python.
-   - En Windows, si aparece un aviso de "Windows protegió tu PC" (SmartScreen),
-     tocá "Más información" → "Ejecutar de todas formas". Pasa porque el
-     ejecutable no está firmado digitalmente, no porque tenga algo malo.
-   - En Mac, si dice que no se puede abrir porque es de un desarrollador no
-     identificado, hacé clic derecho sobre el archivo → "Abrir" → "Abrir" (solo
-     hace falta la primera vez).
-4. Tus libros y libretas se guardan en tu computadora, en una carpeta propia de
-   la app (no adentro del ejecutable), así que no se pierden si lo actualizás
-   más adelante.
+## Cómo se usa
 
-## Para desarrolladores: correrla desde el código
+### Descargando el ejecutable
 
-### Requisitos
+Es la forma más simple si no querés tocar código. En [Releases][releases] hay
+un ejecutable para Windows, Mac y Linux — se compilan solos con GitHub
+Actions cada vez que se publica una versión nueva. Lo abrís y listo, no hace
+falta instalar Python ni nada.
 
-- Python 3.9 o superior instalado en tu computadora.
+[releases]: https://github.com/nehuenmattea/sabatoxd/releases
 
-### Instalación (solo la primera vez)
-
-Abrí una terminal en esta carpeta y ejecutá:
+### Corriéndolo desde el código
 
 ```bash
+git clone https://github.com/nehuenmattea/sabatoxd.git
+cd sabatoxd
+python -m venv venv
+source venv/bin/activate      # en Windows: venv\Scripts\activate
 pip install -r requirements.txt
-```
-
-### Cómo usarla
-
-Cada vez que quieras abrir la app:
-
-```bash
 python app.py
 ```
 
-Esto va a abrir automáticamente `http://127.0.0.1:5000` en tu navegador. Si no se
-abre solo, entrá manualmente a esa dirección.
+Se abre solo en `http://127.0.0.1:5000`.
 
-Para cerrar la app, volvé a la terminal y presioná `Ctrl + C`.
+## Dónde vive tu información
 
-### Generar el ejecutable vos mismo
+- Corriendo desde el código: todo queda en la misma carpeta del proyecto
+  (`estanteria.db`, `static/covers/`, `static/list_backgrounds/`,
+  `static/profile/`).
+- Corriendo el ejecutable: en una carpeta aparte fuera del programa, para que
+  sobreviva a las actualizaciones (`%APPDATA%\Sabatoxd` en Windows,
+  `~/Library/Application Support/Sabatoxd` en Mac,
+  `~/.local/share/Sabatoxd` en Linux).
 
-Los ejecutables de la sección "Releases" se generan automáticamente con GitHub
-Actions (ver `.github/workflows/build.yml`) cada vez que se publica un tag
-`vX.Y.Z`. Si querés generarlo a mano en tu computadora:
+Para respaldar o mover tus datos a otra computadora, lo más simple es
+**Perfil → Copia de seguridad**, que descarga un único archivo `.db` con
+todo. También podés copiar esa carpeta a mano si preferís.
 
-```bash
-pip install -r requirements-build.txt
-pyinstaller build.spec --noconfirm
-```
-
-El ejecutable queda en `dist/`. Ojo: PyInstaller genera un binario para el
-sistema operativo en el que lo corrés (si lo compilás en Windows, te da un
-`.exe`; en Mac, el binario de Mac). Por eso el workflow de GitHub Actions
-compila en los tres sistemas en paralelo.
-
-## Qué incluye
-
-- **Registrar libros**: título, autor, año de publicación, fecha de lectura (no permite
-  fechas futuras), calificación de 1 a 5 estrellas **con medias estrellas**, hasta 5
-  géneros y una portada opcional (si no subís una, se genera una automáticamente).
-- **Géneros**: hay 17 precargados (Poesía, Terror, Ciencia ficción, Fantasía, etc.) y
-  podés agregar los que quieras escribiéndolos en el campo "Agregar género nuevo".
-  Cada libro admite hasta 5.
-- **Libretas (listas)**: creá tantas como quieras, con un color básico a elección
-  (rojo, naranja, amarillo, verde, azul, morado, rosa, gris), una descripción y,
-  opcionalmente, una imagen de fondo (estilo Letterboxd) que se muestra tanto en la
-  tarjeta de la libreta como en su encabezado.
-- **Reutilizar libros entre libretas**: dentro de cada libreta hay un buscador que
-  te deja agregar un libro ya cargado sin tener que volver a escribir sus datos.
-  Un mismo libro puede estar en varias libretas a la vez.
-- **Vista general de todos los libros** con filtros y orden:
-  - Por calificación, incluyendo medias estrellas (4.5, 3.5, etc.) y "sin calificar".
-  - Por género.
-  - Alfabético por título o autor (A-Z / Z-A).
-  - Por año de publicación (más viejo → más nuevo o al revés).
-  - Por cantidad de páginas.
-  - Por fecha de lectura.
-  - Búsqueda de texto libre por título/autor.
-- Editar y eliminar libros o libretas en cualquier momento (eliminar una libreta
-  **no** borra los libros, solo la agrupación).
-- Si ya tenías una versión anterior de la app con datos cargados, no hay que hacer
-  nada especial: al iniciar, la app actualiza la base de datos automáticamente sin
-  borrar nada.
-
-## Dónde queda guardada tu información
-
-Si corrés la app desde el código (`python app.py`), todo se guarda en esta misma
-carpeta:
-
-- `estanteria.db`: la base de datos con todos tus libros, libretas y géneros.
-- `static/covers/`: las imágenes de portada que subas.
-- `static/list_backgrounds/`: las imágenes de fondo de tus libretas.
-
-Si usás el **ejecutable** descargado de Releases, esos mismos archivos se
-guardan en una carpeta propia fuera del programa, para que sobrevivan a futuras
-actualizaciones:
-
-- Windows: `%APPDATA%\Sabatoxd`
-- Mac: `~/Library/Application Support/Sabatoxd`
-- Linux: `~/.local/share/Sabatoxd`
-
-Para hacer una copia de seguridad, simplemente copiá esa carpeta a otro lugar
-(por ejemplo, a un pendrive o a Google Drive). Para restaurarla, volvé a
-colocarla en el mismo lugar antes de abrir la app.
-
-## Estructura del proyecto
+## Cómo está armado
 
 ```
-book_tracker/
-├── app.py              # Rutas y lógica de la aplicación (Flask)
-├── database.py          # Acceso a la base de datos SQLite
-├── requirements.txt
+sabatoxd/
+├── app.py              # rutas Flask y lógica de la aplicación
+├── database.py          # todo el acceso a SQLite, sin ORM
+├── build.spec           # empaquetado a ejecutable con PyInstaller
 ├── static/
 │   ├── style.css
-│   ├── app.js
-│   └── covers/           # Portadas subidas por vos
-└── templates/            # Páginas HTML
+│   ├── app.js            # JS vanilla, sin frameworks
+│   ├── covers/
+│   ├── list_backgrounds/
+│   └── profile/
+└── templates/            # Jinja2, server-side rendering
 ```
 
-## Preguntas frecuentes
+Decisiones a propósito:
 
-**¿Puedo tener varios lectores/usuarios?**
-No, está pensada para un único usuario en una sola computadora.
+- **Sin ORM.** `database.py` usa `sqlite3` directo con SQL escrito a mano.
+  Para el tamaño de esta app un ORM agrega más capas de las que resuelve.
+- **Sin frameworks de frontend.** Las páginas son HTML renderizado en el
+  servidor; el JS que hay es solo para las partes que necesitan
+  interactividad puntual (el selector visual de libros, los buscadores).
+- **Migraciones caseras.** `init_db()` corre en cada arranque y aplica los
+  cambios de esquema que falten sin borrar nada existente. No hay un
+  sistema de migraciones formal (tipo Alembic) porque para una app de un
+  solo usuario local no vale la pena la complejidad extra.
+- **El ejecutable envuelve el mismo Flask.** El build con PyInstaller usa
+  [pywebview](https://pywebview.flowrl.com/) para mostrar una ventana nativa
+  en vez de abrir el navegador, pero por debajo sigue siendo la misma app
+  Flask corriendo en un hilo local.
 
-**¿Funciona sin internet?**
-Sí. Solo intenta cargar las tipografías (Fraunces/Inter) desde Google Fonts; si no
-hay conexión, usa automáticamente tipografías del sistema y se ve igual de bien.
+## Stack
 
-**¿Cómo cambio el puerto si el 5000 está ocupado?**
-Editá la última línea de `app.py` (`app.run(debug=False, port=5000)`) y cambiá el
-número de puerto.
+Python · Flask · SQLite · Jinja2 · JavaScript vanilla · PyInstaller
 
-## Subir el proyecto a Git/GitHub
+## Estado
 
-El repo incluye un `.gitignore` que ya excluye lo que no debería subirse: la base
-de datos (`estanteria.db`), las imágenes que subas en `static/covers/` y
-`static/list_backgrounds/`, y los archivos temporales de Python (`__pycache__/`).
-Así el repo queda liviano y no quedan expuestos tus datos personales.
-
-Para subirlo por primera vez:
-
-```bash
-git init
-git add .
-git commit -m "Primer commit: Sábatoxd"
-git branch -M main
-git remote add origin <URL_DE_TU_REPO>
-git push -u origin main
-```
-
-Cuando alguien (o vos mismo, en otra compu) clone el repo, la base de datos y las
-carpetas de imágenes se crean automáticamente al ejecutar `python app.py`.
+Uso personal, en desarrollo activo cuando me surge una idea o encuentro algo
+que me gustaría que hiciera distinto. Si algo se rompe o tenés una sugerencia,
+abrí un issue.

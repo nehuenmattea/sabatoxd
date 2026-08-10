@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Géneros · Sábatoxd{% endblock %}
+
+{% block content %}
+<section class="hero hero-row">
+    <div>
+        <h1>Géneros</h1>
+        <p class="hero-sub">Renombrá o eliminá géneros. Los géneros nuevos se crean desde el formulario de un libro.</p>
+    </div>
+</section>
+
+{% if genres %}
+<div class="genre-manage-list">
+    {% for g in genres %}
+    <div class="genre-manage-row">
+        <form method="POST" action="{{ url_for('rename_genre_route', genre_id=g['id']) }}" class="genre-rename-form">
+            <input type="text" name="name" value="{{ g['name'] }}" maxlength="40" required>
+            <span class="genre-manage-count">{{ g['book_count'] }} libro{{ 's' if g['book_count'] != 1 else '' }}</span>
+            <button type="submit" class="btn btn-ghost btn-small">Guardar</button>
+        </form>
+        <form method="POST" action="{{ url_for('delete_genre_route', genre_id=g['id']) }}"
+              onsubmit="return confirm('¿Eliminar el género \'{{ g['name'] }}\'? Se quitará de todos los libros que lo tengan.');">
+            <button type="submit" class="btn btn-danger btn-small">Eliminar</button>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p>Todavía no hay géneros.</p>
+</div>
+{% endif %}
+{% endblock %}

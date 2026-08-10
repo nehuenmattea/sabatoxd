@@ -155,6 +155,176 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // -----------------------------------------------------------------------
+    // Selector visual de libros para una libreta: click para agregar/quitar,
+    // se atenúan (con un check) los que ya están agregados. Todo vía AJAX,
+    // sin recargar la página.
+    // -----------------------------------------------------------------------
+    const pickerToggleBtn = document.getElementById("picker-toggle-btn");
+    const pickerBox = document.getElementById("book-picker");
+    const pickerGrid = document.getElementById("book-picker-grid");
+
+    if (pickerToggleBtn && pickerBox && pickerGrid && Array.isArray(window.PICKER_BOOKS)) {
+        const books = window.PICKER_BOOKS;
+        const toggleUrlBase = window.PICKER_TOGGLE_URL_BASE.replace(/\/0$/, "");
+        let opened = false;
+        let dirty = false;
+
+        const renderItem = (b) => {
+            const item = document.createElement("button");
+            item.type = "button";
+            item.className = "picker-item" + (b.in_list ? " picker-item-added" : "");
+            item.dataset.bookId = b.id;
+
+            const cover = document.createElement("div");
+            cover.className = "picker-item-cover";
+            if (b.cover_url) {
+                const img = document.createElement("img");
+                img.src = b.cover_url;
+                img.alt = "";
+                cover.appendChild(img);
+            } else {
+                cover.textContent = (b.title || "?").slice(0, 1).toUpperCase();
+            }
+            const check = document.createElement("span");
+            check.className = "picker-item-check";
+            check.textContent = "✓";
+            cover.appendChild(check);
+
+            const title = document.createElement("span");
+            title.className = "picker-item-title";
+            title.textContent = b.title;
+
+            item.appendChild(cover);
+            item.appendChild(title);
+
+            item.addEventListener("click", () => {
+                item.classList.add("picker-item-loading");
+                fetch(toggleUrlBase + "/" + b.id, {
+                    method: "POST",
+                    headers: { "X-Requested-With": "XMLHttpRequest" },
+                })
+                    .then((r) => r.json())
+                    .then((data) => {
+                        item.classList.remove("picker-item-loading");
+                        if (data && data.ok) {
+                            item.classList.toggle("picker-item-added", data.in_list);
+                            dirty = true;
+                        }
+                    })
+                    .catch(() => item.classList.remove("picker-item-loading"));
+            });
+
+            return item;
+        };
+
+        books.forEach((b) => pickerGrid.appendChild(renderItem(b)));
+
+        pickerToggleBtn.addEventListener("click", () => {
+            opened = !opened;
+            pickerBox.classList.toggle("hidden", !opened);
+            pickerToggleBtn.textContent = opened ? "Ocultar selector" : "Ver todos mis libros y elegir con clicks";
+            if (!opened && dirty) {
+                // Recargar para reflejar los cambios en la grilla de "libros en esta libreta"
+                window.location.reload();
+            }
+        });
+    }
+
+    // -----------------------------------------------------------------------
+    // Buscadores de "libro favorito" en el perfil (hasta 4, reusa el mismo patrón
+    // que el buscador de libros de una libreta)
+    // -----------------------------------------------------------------------
+    if (Array.isArray(window.PROFILE_BOOKS)) {
+        document.querySelectorAll(".fav-book-picker").forEach((wrap) => {
+            const input = wrap.querySelector(".fav-search-input");
+            const hidden = wrap.querySelector(".fav-search-id");
+            const resultsBox = wrap.querySelector(".fav-search-results");
+            const clearBtn = wrap.querySelector(".fav-clear-btn");
+            if (!input || !hidden || !resultsBox) return;
+
+            const books = window.PROFILE_BOOKS;
+
+            const renderResults = (matches) => {
+                resultsBox.innerHTML = "";
+                if (matches.length === 0) {
+                    const empty = document.createElement("div");
+                    empty.className = "search-item search-item-empty";
+                    empty.textContent = "Sin resultados";
+                    resultsBox.appendChild(empty);
+                    return;
+                }
+                matches.forEach((b) => {
+                    const item = document.createElement("div");
+                    item.className = "search-item";
+                    item.textContent = b.title + (b.author ? " — " + b.author : "");
+                    item.addEventListener("click", () => {
+                        input.value = b.title + (b.author ? " — " + b.author : "");
+                        hidden.value = b.id;
+                        resultsBox.classList.remove("active");
+                    });
+                    resultsBox.appendChild(item);
+                });
+            };
+
+            input.addEventListener("input", () => {
+                const q = input.value.trim().toLowerCase();
+                hidden.value = "";
+                if (!q) {
+                    resultsBox.classList.remove("active");
+                    return;
+                }
+                const matches = books
+                    .filter((b) => (b.title || "").toLowerCase().includes(q) || (b.author || "").toLowerCase().includes(q))
+                    .slice(0, 8);
+                renderResults(matches);
+                resultsBox.classList.add("active");
+            });
+
+            input.addEventListener("focus", () => {
+                if (input.value.trim()) resultsBox.classList.add("active");
+            });
+
+            if (clearBtn) {
+                clearBtn.addEventListener("click", () => {
+                    input.value = "";
+                    hidden.value = "";
+                    resultsBox.classList.remove("active");
+                });
+            }
+
+            document.addEventListener("click", (e) => {
+                if (!e.target.closest(".fav-book-picker")) {
+                    resultsBox.classList.remove("active");
+                }
+            });
+        });
+    }
+
+    // -----------------------------------------------------------------------
+    // Confirmación explícita para restaurar una copia de seguridad (perfil)
+    // -----------------------------------------------------------------------
+    const restoreForm = document.getElementById("restore-backup-form");
+    if (restoreForm) {
+        restoreForm.addEventListener("submit", (e) => {
+            const checkbox = document.getElementById("restore-confirm-checkbox");
+            const fileInput = document.getElementById("restore-file-input");
+            if (!fileInput.value) {
+                e.preventDefault();
+                alert("Elegí primero un archivo de copia de seguridad.");
+                return;
+            }
+            if (!checkbox.checked) {
+                e.preventDefault();
+                alert("Tenés que marcar la casilla de confirmación antes de restaurar.");
+                return;
+            }
+            if (!confirm("Esto va a REEMPLAZAR todos los libros, libretas y datos actuales por los del archivo elegido. ¿Continuar?")) {
+                e.preventDefault();
+            }
+        });
+    }
+
     // Confirmar antes de subir una fecha de lectura futura (respaldo del atributo max)
     const dateInput = document.getElementById("date_read");
     if (dateInput) {

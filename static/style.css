@@ -79,20 +79,27 @@ p { margin: 0 0 0.6em; }
 }
 
 .topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* Alineación limpia entre logo, nav y botón */
-    
-    /* 1. Más presencia vertical y horizontal */
-    padding: 22px 36px;             /* Pasamos de 18px a 22px arriba/abajo */
-    min-height: 76px;               /* Le aseguramos una altura mínima robusta */
-    
     border-bottom: 1px solid var(--border-soft);
     position: sticky;
     top: 0;
     background: rgba(18, 24, 32, 0.94); /* Alineado a tu variable --bg con buena opacidad */
     backdrop-filter: blur(12px);
     z-index: 20;
+}
+
+.topbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Alineación limpia entre logo, nav y botón */
+    gap: 24px;
+    flex-wrap: wrap;
+
+    max-width: 1100px;
+    margin: 0 auto;
+
+    /* 1. Más presencia vertical y horizontal */
+    padding: 22px 28px;             /* Mismo padding horizontal que .page */
+    min-height: 76px;               /* Le aseguramos una altura mínima robusta */
 }
 
 .brand {
@@ -828,14 +835,345 @@ p { margin: 0 0 0.6em; }
 .or-divider { text-align: center; color: var(--text-muted); font-size: 0.8rem; margin: 16px 0 10px; }
 
 /* ==========================================================================
+   Perfil (chip en la barra superior)
+   ========================================================================== */
+
+.topbar-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+
+.profile-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px 6px 6px;
+    border-radius: 999px;
+    border: 1px solid var(--border-soft);
+    color: var(--text-light);
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+.profile-chip:hover, .profile-chip.active { border-color: var(--accent); background: var(--bg-panel-hover); }
+.profile-chip img {
+    width: 28px; height: 28px; border-radius: 50%; object-fit: cover; display: block;
+}
+.profile-chip-fallback {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent); color: var(--accent-ink);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-weight: 700; font-size: 0.85rem;
+}
+.profile-chip-name { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ==========================================================================
+   Descripción del libro
+   ========================================================================== */
+
+.detail-description { margin: 18px 0; }
+.detail-description h2 { font-size: 1rem; color: var(--paper); margin-bottom: 6px; }
+.detail-description p { color: var(--text-muted); font-size: 0.92rem; white-space: pre-wrap; }
+
+.author-link { color: inherit; }
+.author-link:hover { color: var(--paper); text-decoration: underline; }
+
+/* ==========================================================================
+   Lecturas (calificaciones múltiples)
+   ========================================================================== */
+
+.detail-readings { margin: 22px 0; }
+.detail-readings h2 { font-size: 1rem; color: var(--paper); margin-bottom: 10px; }
+
+.reading-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+
+.reading-row {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+}
+.reading-row-main { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.reading-date { font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-muted); }
+.reading-date-empty { font-style: italic; }
+.reading-note { margin: 6px 0 0; font-size: 0.85rem; color: var(--text-muted); }
+.reading-row-actions { display: flex; gap: 14px; margin-top: 8px; }
+.link-danger { color: var(--danger); }
+.link-danger:hover { color: #ff8f88; }
+.inline-form { display: inline; }
+
+.reading-edit-form {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border-soft);
+}
+.reading-edit-form select {
+    width: 100%;
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(44,32,19,0.18);
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+}
+#new-reading-form { margin-top: 10px; }
+
+.hidden { display: none !important; }
+
+.btn-small { padding: 7px 14px; font-size: 0.82rem; }
+
+/* ==========================================================================
+   Selector visual de libros para agregar a una libreta ("picker")
+   ========================================================================== */
+
+.book-picker {
+    margin: 14px 0 26px;
+    padding: 16px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+}
+.book-picker-header { margin-bottom: 12px; }
+.book-picker-header h3 { font-size: 0.95rem; color: var(--paper); margin-bottom: 4px; }
+
+.book-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 12px;
+    max-height: 480px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.picker-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-family: var(--font-body);
+    transition: opacity 0.15s ease, transform 0.1s ease;
+}
+.picker-item:hover { transform: translateY(-2px); }
+.picker-item-cover {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--paper-soft);
+    color: var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-weight: 700; font-size: 1.4rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+}
+.picker-item-cover img { width: 100%; height: 100%; object-fit: cover; }
+.picker-item-title {
+    font-size: 0.76rem; color: var(--text-light);
+    text-align: center; line-height: 1.25;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.picker-item-check {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(46, 139, 87, 0.75);
+    color: #fff;
+    font-size: 1.6rem;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+.picker-item-added { opacity: 0.45; }
+.picker-item-added .picker-item-check { opacity: 1; }
+.picker-item-loading { opacity: 0.6; pointer-events: none; }
+
+/* ==========================================================================
+   Notas de texto libre en una libreta
+   ========================================================================== */
+
+.notes-box {
+    margin: 18px 0 30px;
+    padding: 18px 20px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+}
+.notes-box h2 { font-size: 1rem; color: var(--paper); }
+
+.note-add-form { display: flex; gap: 10px; margin: 10px 0 14px; }
+.note-add-form input[type="text"] {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(230, 234, 239, 0.18);
+    background: var(--bg);
+    color: var(--text-light);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+}
+.note-add-form input[type="text"]:focus { border-color: var(--accent); outline: none; }
+
+.note-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.note-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+}
+.note-toggle-form, .note-delete-form { margin: 0; }
+.note-check {
+    width: 22px; height: 22px; flex: none;
+    border-radius: 50%;
+    border: 1px solid var(--border-soft);
+    background: transparent;
+    color: var(--accent-soft);
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+}
+.note-text { flex: 1; font-size: 0.88rem; color: var(--text-light); }
+.note-done .note-text { text-decoration: line-through; color: var(--text-muted); }
+.note-done .note-check { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ==========================================================================
+   Autores
+   ========================================================================== */
+
+.hero-eyebrow { margin-bottom: 6px; }
+
+.author-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+}
+.author-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+.author-card:hover { border-color: var(--accent); background: var(--bg-panel-hover); }
+.author-card-initial {
+    width: 40px; height: 40px; border-radius: 50%; flex: none;
+    background: var(--accent); color: var(--accent-ink);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-weight: 700;
+}
+.author-card-name { font-weight: 600; color: var(--paper); display: block; }
+.author-card-count { font-size: 0.78rem; color: var(--text-muted); display: block; }
+
+/* ==========================================================================
+   Géneros (administración)
+   ========================================================================== */
+
+.genre-manage-list { display: flex; flex-direction: column; gap: 8px; max-width: 640px; }
+.genre-manage-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+}
+.genre-rename-form { display: flex; align-items: center; gap: 10px; flex: 1; }
+.genre-rename-form input[type="text"] {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(230, 234, 239, 0.18);
+    background: var(--bg);
+    color: var(--text-light);
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+}
+.genre-manage-count { font-size: 0.76rem; color: var(--text-muted); white-space: nowrap; }
+
+/* ==========================================================================
+   Actividad (logs)
+   ========================================================================== */
+
+.activity-list { display: flex; flex-direction: column; gap: 2px; max-width: 720px; }
+.activity-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 4px;
+    border-bottom: 1px solid var(--border-soft);
+}
+.activity-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent-soft);
+    margin-top: 6px; flex: none;
+}
+.activity-body { display: flex; flex-direction: column; gap: 2px; }
+.activity-message { font-size: 0.9rem; color: var(--text-light); }
+.activity-time { font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); }
+
+/* ==========================================================================
+   Perfil (página)
+   ========================================================================== */
+
+.current-profile-photo img { border-radius: 50%; }
+.current-profile-photo { width: 96px; height: 96px; border-radius: 50%; }
+.profile-photo-placeholder {
+    display: flex; align-items: center; justify-content: center;
+    background: var(--accent); color: var(--accent-ink);
+    font-family: var(--font-display); font-weight: 700; font-size: 2rem;
+    border-radius: 50%;
+}
+
+.fav-books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+}
+.fav-book-picker { display: flex; flex-direction: column; gap: 8px; }
+.fav-book-slot-cover {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--paper-soft);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.fav-book-slot-cover img { width: 100%; height: 100%; object-fit: cover; }
+.fav-slot-empty {
+    font-family: var(--font-display); font-weight: 700; font-size: 1.6rem;
+    color: var(--ink-soft);
+}
+.fav-book-picker .search-select { flex: none; min-width: 0; width: 100%; }
+.fav-clear-btn { align-self: flex-start; }
+
+.backup-box { margin-top: 24px; }
+.backup-box h2 { font-size: 1.05rem; color: var(--paper); }
+.backup-restore-title { margin-top: 22px; }
+.restore-form { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; max-width: 480px; }
+.restore-form input[type="file"] {
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(230, 234, 239, 0.18);
+    background: var(--bg-panel);
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+.checkbox-danger { color: var(--danger); font-weight: 600; }
+.checkbox-danger input { accent-color: var(--danger); }
+
+/* ==========================================================================
    Responsive
    ========================================================================== */
 
 @media (max-width: 720px) {
-    .topbar { flex-wrap: wrap; padding: 14px 18px; }
+    .topbar-inner { flex-wrap: wrap; padding: 14px 18px; gap: 12px; }
+    .nav-links { flex-wrap: wrap; gap: 16px; }
+    .topbar-right { margin-left: 0; }
     .page { padding: 22px 16px 60px; }
     .detail-page { grid-template-columns: 1fr; }
     .detail-cover { max-width: 220px; }
     .form-row-split { flex-direction: column; }
     .book-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 16px; }
+    .book-picker-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); }
+    .profile-chip-name { display: none; }
 }

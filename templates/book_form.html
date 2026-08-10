@@ -37,10 +37,11 @@
                 </div>
 
                 <div class="form-field">
-                    <label for="author">Autor</label>
-                    <input type="text" id="author" name="author"
-                            maxlength="100"
-                           value="{{ v['author'] if v and v['author'] else '' }}" placeholder="Ernesto Sábato">
+                    <label for="authors">Autor(es)</label>
+                    <input type="text" id="authors" name="authors"
+                            maxlength="300"
+                           value="{{ authors_text or '' }}" placeholder="Ernesto Sábato, Otro Autor">
+                    <span class="field-hint">Si hay más de uno, separalos con comas.</span>
                 </div>
 
                 <div class="form-row form-row-split">
@@ -57,10 +58,17 @@
                 </div>
 
                 <div class="form-field">
+                    <label for="description">Descripción</label>
+                    <textarea id="description" name="description" rows="4" maxlength="2000"
+                              placeholder="De qué trata el libro...">{{ v['description'] if v and v['description'] else '' }}</textarea>
+                </div>
+
+                {% if not book %}
+                <div class="form-field">
                     <label for="date_read">Fecha de lectura</label>
                     <input type="date" id="date_read" name="date_read" max="{{ today }}"
                            value="{{ v['date_read'] if v and v['date_read'] else '' }}">
-                    <span class="field-hint">Dejalo vacío si todavía no lo leíste. No puede ser una fecha futura.</span>
+                    <span class="field-hint">Dejalo vacío si todavía no lo leíste. Después vas a poder agregar más lecturas desde la ficha del libro.</span>
                 </div>
 
                 <div class="form-field">
@@ -78,6 +86,11 @@
                     </div>
                     <span class="field-hint">Hacé clic en la mitad izquierda de una estrella para calificar con media estrella.</span>
                 </div>
+                {% else %}
+                <div class="form-field">
+                    <span class="field-hint">Para agregar otra lectura, cambiar la fecha o la calificación, hacelo desde la ficha del libro (sección "Lecturas").</span>
+                </div>
+                {% endif %}
 
                 <div class="form-field">
                     <label>Géneros <span class="field-hint">(hasta {{ max_genres }})</span></label>

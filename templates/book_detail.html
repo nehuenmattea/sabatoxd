@@ -17,12 +17,18 @@
 
     <div class="detail-info">
         <h1>{{ book['title'] }}</h1>
-        <p class="detail-author">{{ book['author'] or 'Autor desconocido' }}</p>
+        {% if authors %}
+            <p class="detail-author">
+                {% for a in authors %}<a href="{{ url_for('author_detail', author_id=a['id']) }}" class="author-link">{{ a['name'] }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+            </p>
+        {% else %}
+            <p class="detail-author">Autor desconocido</p>
+        {% endif %}
 
         <div class="detail-meta">
             {% if book['year'] %}<span class="meta-chip">{{ book['year'] }}</span>{% endif %}
             {% if book['pages'] %}<span class="meta-chip">{{ book['pages'] }} páginas</span>{% endif %}
-            {% if book['date_read'] %}<span class="meta-chip">Leído el {{ book['date_read'] }}</span>{% endif %}
+            {% if book['date_read'] %}<span class="meta-chip">Última lectura: {{ book['date_read'] }}</span>{% endif %}
         </div>
 
         {% if genres %}
@@ -42,11 +48,93 @@
             {% endif %}
         </div>
 
+        {% if book['description'] %}
+        <div class="detail-description">
+            <h2>Descripción</h2>
+            <p>{{ book['description'] }}</p>
+        </div>
+        {% endif %}
+
         <div class="detail-actions">
             <a href="{{ url_for('edit_book', book_id=book['id']) }}" class="btn btn-ghost">Editar</a>
             <form method="POST" action="{{ url_for('delete_book', book_id=book['id']) }}"
                   onsubmit="return confirm('¿Eliminar \'{{ book['title'] }}\' de la estantería? Esta acción no se puede deshacer.');">
                 <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
+        </div>
+
+        <div class="detail-readings">
+            <h2>Lecturas</h2>
+            {% if readings %}
+                <div class="reading-list">
+                    {% for r in readings %}
+                    <div class="reading-row" id="reading-{{ r['id'] }}">
+                        <div class="reading-row-view">
+                            <div class="reading-row-main">
+                                {% if r['rating'] %}{{ macros.stars_display(r['rating']) }}{% else %}<span class="no-rating">Sin calificar</span>{% endif %}
+                                {% if r['date_read'] %}<span class="reading-date">{{ r['date_read'] }}</span>{% else %}<span class="reading-date reading-date-empty">Sin fecha</span>{% endif %}
+                            </div>
+                            {% if r['note'] %}<p class="reading-note">{{ r['note'] }}</p>{% endif %}
+                            <div class="reading-row-actions">
+                                <button type="button" class="link-inline reading-edit-toggle" data-target="reading-form-{{ r['id'] }}">Editar</button>
+                                <form method="POST" action="{{ url_for('delete_reading_route', book_id=book['id'], reading_id=r['id']) }}"
+                                      onsubmit="return confirm('¿Eliminar esta lectura?');" class="inline-form">
+                                    <button type="submit" class="link-inline link-danger">Eliminar</button>
+                                </form>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('edit_reading', book_id=book['id'], reading_id=r['id']) }}"
+                              class="reading-edit-form hidden" id="reading-form-{{ r['id'] }}">
+                            <div class="form-row form-row-split">
+                                <div class="form-field">
+                                    <label>Fecha</label>
+                                    <input type="date" name="date_read" max="{{ today }}" value="{{ r['date_read'] or '' }}">
+                                </div>
+                                <div class="form-field">
+                                    <label>Calificación</label>
+                                    <select name="rating">
+                                        <option value="0" {{ 'selected' if not r['rating'] }}>Sin calificar</option>
+                                        {% for opt in rating_options %}
+                                        <option value="{{ opt }}" {{ 'selected' if r['rating'] == opt }}>{{ opt|fmt_rating }} ★</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-field">
+                                <label>Nota (opcional)</label>
+                                <input type="text" name="note" maxlength="300" value="{{ r['note'] or '' }}" placeholder="Relectura, distinta impresión, etc.">
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-small">Guardar lectura</button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-hint">Todavía no hay lecturas registradas.</p>
+            {% endif %}
+
+            <button type="button" class="btn btn-ghost btn-small" id="new-reading-toggle">+ Agregar lectura</button>
+            <form method="POST" action="{{ url_for('new_reading', book_id=book['id']) }}" class="reading-edit-form hidden" id="new-reading-form">
+                <div class="form-row form-row-split">
+                    <div class="form-field">
+                        <label>Fecha</label>
+                        <input type="date" name="date_read" max="{{ today }}">
+                    </div>
+                    <div class="form-field">
+                        <label>Calificación</label>
+                        <select name="rating">
+                            <option value="0" selected>Sin calificar</option>
+                            {% for opt in rating_options %}
+                            <option value="{{ opt }}">{{ opt|fmt_rating }} ★</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-field">
+                    <label>Nota (opcional)</label>
+                    <input type="text" name="note" maxlength="300" placeholder="Relectura, distinta impresión, etc.">
+                </div>
+                <button type="submit" class="btn btn-primary btn-small">Guardar lectura</button>
             </form>
         </div>
 
@@ -68,4 +156,17 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('new-reading-toggle').addEventListener('click', function () {
+    document.getElementById('new-reading-form').classList.toggle('hidden');
+});
+document.querySelectorAll('.reading-edit-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        document.getElementById(btn.dataset.target).classList.toggle('hidden');
+    });
+});
+</script>
 {% endblock %}

@@ -43,8 +43,49 @@
     {% else %}
         <p class="empty-hint">Ya agregaste todos tus libros a esta libreta.</p>
     {% endif %}
+
+    {% if has_any_books %}
+    <button type="button" class="btn btn-ghost" id="picker-toggle-btn">Ver todos mis libros y elegir con clicks</button>
+    {% endif %}
+
     <p class="or-divider">— o bien —</p>
     <a href="{{ url_for('new_book', list_id=list['id']) }}" class="btn btn-ghost">Cargar un libro nuevo directamente aquí</a>
+</div>
+
+{% if has_any_books %}
+<div class="book-picker hidden" id="book-picker">
+    <div class="book-picker-header">
+        <h3>Tocá un libro para agregarlo o quitarlo</h3>
+        <span class="field-hint">Los que ya están en esta libreta aparecen atenuados con un check.</span>
+    </div>
+    <div class="book-picker-grid" id="book-picker-grid"></div>
+</div>
+{% endif %}
+
+<div class="notes-box">
+    <h2>Notas rápidas</h2>
+    <p class="field-hint">Anotá libros que querés leer o cualquier otra cosa, sin necesidad de cargarlos como libro.</p>
+    <form method="POST" action="{{ url_for('new_list_note', list_id=list['id']) }}" class="note-add-form">
+        <input type="text" name="text" maxlength="300" placeholder="Ej: Para leer — Rayuela, Cortázar" required autocomplete="off">
+        <button type="submit" class="btn btn-primary btn-small">Agregar</button>
+    </form>
+    {% if notes %}
+    <ul class="note-list">
+        {% for note in notes %}
+        <li class="note-item {{ 'note-done' if note['done'] }}">
+            <form method="POST" action="{{ url_for('toggle_note_route', list_id=list['id'], note_id=note['id']) }}" class="note-toggle-form">
+                <button type="submit" class="note-check" title="Marcar como hecho">{{ '✓' if note['done'] else '' }}</button>
+            </form>
+            <span class="note-text">{{ note['text'] }}</span>
+            <form method="POST" action="{{ url_for('delete_note_route', list_id=list['id'], note_id=note['id']) }}" class="note-delete-form">
+                <button type="submit" class="btn-remove" title="Borrar nota">✕</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p class="empty-hint">No hay notas todavía.</p>
+    {% endif %}
 </div>
 
 {% if books %}
@@ -85,5 +126,8 @@
 {% block scripts %}
 <script>
     window.AVAILABLE_BOOKS = {{ available_books_json|tojson }};
+    window.PICKER_BOOKS = {{ picker_books_json|tojson }};
+    window.PICKER_LIST_ID = {{ list['id'] }};
+    window.PICKER_TOGGLE_URL_BASE = "{{ url_for('toggle_book_in_list_ajax', list_id=list['id'], book_id=0) }}";
 </script>
 {% endblock %}
